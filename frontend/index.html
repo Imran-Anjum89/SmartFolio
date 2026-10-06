@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFolio — Intelligent Investment Decision-Support System</title>
+    <meta name="description" content="Adaptive Machine Learning Return Forecasting and Markowitz Portfolio Optimization with Closed Feedback Loop. SEBI-compliant educational and research simulation platform.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Accessibility Skip Link -->
+    <a href="#main-container" class="skip-link">Skip to main content</a>
+
+    <!-- Unified Stovest Minimalist Header Bar -->
+    <header class="app-header" role="banner">
+        <div class="header-brand">
+            <div class="logo-mark" aria-hidden="true">
+                <span class="logo-icon">▲</span>
+            </div>
+            <div class="brand-info">
+                <div class="brand-row">
+                    <span class="brand-name">SmartFolio</span>
+                    <span class="badge-tag">v1.0</span>
+                </div>
+                <span class="brand-sub">Adaptive Quantitative System</span>
+            </div>
+        </div>
+
+        <!-- Integrated Center Navigation -->
+        <nav class="nav-bar" role="navigation" aria-label="Main Application Modules">
+            <button class="nav-tab active" data-tab="tab-optimizer" id="btn-tab-optimizer" role="tab" aria-selected="true" aria-controls="tab-optimizer">
+                <span class="tab-icon" aria-hidden="true">💼</span> Optimizer
+            </button>
+            <button class="nav-tab" data-tab="tab-ml" id="btn-tab-ml" role="tab" aria-selected="false" aria-controls="tab-ml">
+                <span class="tab-icon" aria-hidden="true">🧠</span> Intelligence
+            </button>
+            <button class="nav-tab" data-tab="tab-feedback" id="btn-tab-feedback" role="tab" aria-selected="false" aria-controls="tab-feedback">
+                <span class="tab-icon" aria-hidden="true">🔄</span> Feedback
+            </button>
+            <button class="nav-tab" data-tab="tab-backtest" id="btn-tab-backtest" role="tab" aria-selected="false" aria-controls="tab-backtest">
+                <span class="tab-icon" aria-hidden="true">📈</span> Backtest
+            </button>
+            <button class="nav-tab" data-tab="tab-explorer" id="btn-tab-explorer" role="tab" aria-selected="false" aria-controls="tab-explorer">
+                <span class="tab-icon" aria-hidden="true">📊</span> Market Explorer
+            </button>
+        </nav>
+
+        <!-- Right Indicators & Legal Hub -->
+        <div class="header-actions">
+            <div class="status-indicator" role="status" aria-live="polite" title="Active Model Champion">
+                <span class="status-dot pulse" aria-hidden="true"></span>
+                <span class="status-text" id="champion-badge">Ensemble v1.0</span>
+            </div>
+            <div class="market-tag" title="Target Market Universe">
+                <span class="flag" aria-hidden="true">🇮🇳</span> NIFTY 50
+            </div>
+            <button type="button" class="btn-header-legal" data-legal-tab="privacy" aria-label="Open Compliance and Legal Transparency Hub">
+                🛡️ Legal
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container" id="main-container" role="main">
+
+        <!-- TAB 1: PORTFOLIO OPTIMIZER -->
+        <section id="tab-optimizer" class="tab-content active" role="tabpanel" aria-labelledby="btn-tab-optimizer">
+            <div class="grid-2col">
+                <!-- Left: Controls Panel -->
+                <div class="glass-card controls-card">
+                    <h2 class="card-title">Investment Configuration</h2>
+                    
+                    <div class="form-group">
+                        <label for="input-capital">Total Investment Capital (₹ INR)</label>
+                        <div class="input-prefix-wrapper">
+                            <span class="prefix" aria-hidden="true">₹</span>
+                            <input type="number" id="input-capital" value="100000" min="1000" step="5000" aria-label="Investment Capital in Indian Rupees">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="universe-label">Select Portfolio Universe (Minimum 2 Assets)</label>
+                        <div class="asset-chips" id="universe-chips" role="group" aria-labelledby="universe-label">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="risk-profile-label">Investor Risk Profile</label>
+                        <div class="radio-cards" role="radiogroup" aria-labelledby="risk-profile-label">
+                            <label class="radio-card" tabindex="0">
+                                <input type="radio" name="risk-profile" value="conservative" aria-label="Conservative Risk Profile">
+                                <div class="radio-content">
+                                    <span class="rc-title">Conservative</span>
+                                    <span class="rc-desc">λ = 5.0 (Capital Protection)</span>
+                                </div>
+                            </label>
+                            <label class="radio-card selected" tabindex="0">
+                                <input type="radio" name="risk-profile" value="moderate" checked aria-label="Moderate Risk Profile">
+                                <div class="radio-content">
+                                    <span class="rc-title">Moderate</span>
+                                    <span class="rc-desc">λ = 2.0 (Balanced Growth)</span>
+                                </div>
+                            </label>
+                            <label class="radio-card" tabindex="0">
+                                <input type="radio" name="risk-profile" value="aggressive" aria-label="Aggressive Risk Profile">
+                                <div class="radio-content">
+                                    <span class="rc-title">Aggressive</span>
+                                    <span class="rc-desc">λ = 0.5 (Maximum Return)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="select-strategy">Optimization Objective</label>
+                            <select id="select-strategy" class="custom-select" aria-label="Optimization Objective Strategy">
+                                <option value="max_sharpe" selected>Maximum Sharpe Ratio</option>
+                                <option value="risk_aware">Risk-Aware (Utility Balancing)</option>
+                                <option value="min_volatility">Minimum Volatility</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="select-ml-model">Return Forecaster (μ̂)</label>
+                            <select id="select-ml-model" class="custom-select" aria-label="Machine Learning Forecasting Model">
+                                <option value="ensemble" selected>XGBoost + LSTM Ensemble</option>
+                                <option value="xgboost">XGBoost Regressor</option>
+                                <option value="lstm">PyTorch LSTM</option>
+                                <option value="baseline">Historical Mean (Baseline)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="info-banner">
+                        <span class="info-icon" aria-hidden="true">🛡️</span>
+                        <span>Enforcing Markowitz constraints: <strong>w<sub>i</sub> ≤ 40%</strong> cap per stock, <strong>Σ w<sub>i</sub> = 100%</strong>, and <strong>Ledoit-Wolf covariance</strong> noise shrinkage.</span>
+                    </div>
+
+                    <!-- Form Consent & Risk Acknowledgement (Items 5 & 10) -->
+                    <div class="form-group consent-wrapper">
+                        <label class="custom-checkbox-label" for="input-consent-optimizer">
+                            <input type="checkbox" id="input-consent-optimizer" checked aria-describedby="consent-desc">
+                            <span class="custom-checkmark" aria-hidden="true"></span>
+                            <span class="checkbox-text" id="consent-desc">
+                                I acknowledge that outputs are <strong>probabilistic mathematical simulations</strong> subject to market risk, and consent to local processing of my configuration as per the 
+                                <a href="#" class="legal-trigger" data-legal-tab="privacy">Privacy Policy</a> &amp; 
+                                <a href="#" class="legal-trigger" data-legal-tab="terms">Terms of Service</a>.
+                            </span>
+                        </label>
+                        <div id="consent-warning-msg" class="consent-alert" style="display: none;" role="alert" aria-live="assertive">
+                            ⚠️ <strong>Consent Required:</strong> Please confirm your acknowledgment of the market risk disclaimer and data terms to proceed.
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="btn-optimize" aria-label="Generate Optimized Allocation" title="Click to calculate Markowitz Ledoit-Wolf allocations">
+                        <span>⚡ Generate Optimized Allocation</span>
+                    </button>
+                </div>
+
+                <!-- Right: Portfolio Recommendation Output -->
+                <div class="glass-card output-card" id="portfolio-output">
+                    <div class="output-header">
+                        <h2 class="card-title">Portfolio Allocation &amp; Decision Output</h2>
+                        <span class="badge-status" id="res-model-badge">Model: Ensemble v1.0</span>
+                    </div>
+
+                    <!-- StockWise Hero Portfolio Overview Card -->
+                    <div class="sw-hero-portfolio-card">
+                        <div class="sw-hero-header">
+                            <div>
+                                <span class="sw-hero-label">Total Allocated Capital</span>
+                                <div class="sw-hero-capital" id="hero-total-capital">₹1,00,000</div>
+                            </div>
+                            <div class="sw-hero-tags">
+                                <span class="sw-hero-badge return" id="hero-projected-return">▲ +18.42% Exp. Return</span>
+                                <span class="sw-hero-badge sharpe" id="hero-sharpe-score">⚡ Sharpe 1.48</span>
+                            </div>
+                        </div>
+                        <div class="sw-hero-subbar">
+                            <span class="sw-hero-subitem">Risk: <strong id="hero-volatility-val">12.1%</strong> Volatility</span>
+                            <span class="sw-dot-sep">•</span>
+                            <span class="sw-hero-subitem">Markowitz Cap: <strong>w<sub>i</sub> ≤ 40%</strong></span>
+                            <span class="sw-dot-sep">•</span>
+                            <span class="sw-hero-subitem" id="hero-model-tag">Ensemble v1.0</span>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="metrics-row" role="region" aria-label="Portfolio Key Metrics">
+                        <div class="metric-box">
+                            <span class="metric-label">Expected Return</span>
+                            <span class="metric-value text-green" id="res-expected-return">--%</span>
+                            <span class="metric-sub">Annualized Forecast</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="metric-label">Portfolio Volatility</span>
+                            <span class="metric-value text-cyan" id="res-volatility">--%</span>
+                            <span class="metric-sub">Ledoit-Wolf Risk</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="metric-label">Sharpe Ratio</span>
+                            <span class="metric-value text-purple" id="res-sharpe">--</span>
+                            <span class="metric-sub">Risk-Adjusted Score</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="metric-label">Capital Allocated</span>
+                            <span class="metric-value" id="res-capital">₹1,00,000</span>
+                            <span class="metric-sub">100% Invested</span>
+                        </div>
+                    </div>
+
+                    <!-- Plotly Weight Allocation Chart -->
+                    <div id="plot-portfolio-donut" class="chart-container-sm" role="img" aria-label="Asset Allocation Donut Chart"></div>
+
+                    <!-- Asset Breakdown Table with Explainability -->
+                    <h3 class="section-subtitle">Asset Breakdown &amp; Decision Explainability</h3>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="table-allocations" aria-label="Portfolio Allocations and Explainability Rationale">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Asset</th>
+                                    <th scope="col">Weight (%)</th>
+                                    <th scope="col">Investment (₹)</th>
+                                    <th scope="col">Exp. Return</th>
+                                    <th scope="col">Decision Rationale (Gap 7)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="5" class="text-center text-muted">Click "Generate Optimized Allocation" to run optimizer.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: ML & DEEP LEARNING MODEL INTELLIGENCE -->
+        <section id="tab-ml" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-ml">
+            <div class="glass-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 class="card-title">Model Competition &amp; Forecasting Intelligence</h2>
+                        <p class="card-subtitle">Comparing Historical Mean, XGBoost, PyTorch LSTM, and Ensemble models via out-of-sample time-series validation.</p>
+                    </div>
+                    <div class="stock-picker-inline">
+                        <label for="ml-symbol-select">Evaluate Asset:</label>
+                        <select id="ml-symbol-select" class="custom-select-inline" aria-label="Select Asset for Model Evaluation">
+                            <option value="TCS.NS" selected>TCS (Information Tech)</option>
+                            <option value="RELIANCE.NS">Reliance Industries (Energy)</option>
+                            <option value="INFY.NS">Infosys (Information Tech)</option>
+                            <option value="HDFCBANK.NS">HDFC Bank (Banking)</option>
+                            <option value="ITC.NS">ITC Ltd (FMCG)</option>
+                        </select>
+                        <button class="btn-secondary" id="btn-evaluate-ml" aria-label="Evaluate ML Models for Selected Asset">Evaluate Models</button>
+                    </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div class="grid-2col-even mt-4">
+                    <div>
+                        <h3 class="section-subtitle">Model Performance Comparison (Out-of-Sample)</h3>
+                        <div class="table-wrapper">
+                            <table class="data-table" id="table-model-eval" aria-label="Machine Learning Model Evaluation Metrics">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Model</th>
+                                        <th scope="col">MAE</th>
+                                        <th scope="col">RMSE</th>
+                                        <th scope="col">R² Score</th>
+                                        <th scope="col">Directional Acc.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" class="text-center text-muted">Loading model comparison...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Feature Importance Chart -->
+                    <div>
+                        <h3 class="section-subtitle">XGBoost Tabular Feature Importance</h3>
+                        <div id="plot-feature-importance" class="chart-container-sm" role="img" aria-label="XGBoost Feature Importance Bar Chart"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: FEEDBACK LOOP & RETRAINING -->
+        <section id="tab-feedback" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-feedback">
+            <div class="glass-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 class="card-title">Dual Feedback Engine &amp; Champion–Challenger Lifecycle</h2>
+                        <p class="card-subtitle">Tracks prediction errors vs realized outcomes and enforces the Portfolio-Sharpe gate on candidate models.</p>
+                    </div>
+                    <button class="btn-primary-glow" id="btn-trigger-retrain" aria-label="Trigger Adaptive Model Retraining">
+                        <span>⚡ Trigger Adaptive Retraining</span>
+                    </button>
+                </div>
+
+                <!-- Feedback KPI Grid -->
+                <div class="metrics-row mt-4" role="region" aria-label="Model Feedback Metrics">
+                    <div class="metric-box">
+                        <span class="metric-label">Active Champion</span>
+                        <span class="metric-value text-purple" id="fb-champion-ver">v1.0</span>
+                        <span class="metric-sub">Production Model</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Feedback Records</span>
+                        <span class="metric-value" id="fb-total-count">0</span>
+                        <span class="metric-sub">Historical + Live</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Mean Abs. Error (MAE)</span>
+                        <span class="metric-value text-green" id="fb-mae">0.00%</span>
+                        <span class="metric-sub">Tracking Error</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Challenger Promotions</span>
+                        <span class="metric-value text-cyan" id="fb-promotions">0</span>
+                        <span class="metric-sub">Passed Sharpe Gate</span>
+                    </div>
+                </div>
+
+                <!-- Champion-Challenger Result Banner -->
+                <div class="challenger-card mt-4" id="challenger-status-box" style="display: none;" role="region" aria-label="Retraining Evaluation Results">
+                    <div class="challenger-header">
+                        <span class="badge-verdict" id="verdict-badge">PROMOTED</span>
+                        <span class="challenger-title" id="verdict-title">Champion vs Challenger Evaluation</span>
+                    </div>
+                    <p class="challenger-reason" id="verdict-reason">--</p>
+                </div>
+
+                <!-- Recent Prediction Feedback Logs -->
+                <h3 class="section-subtitle mt-4">Recent Prediction Error Logs</h3>
+                <div class="table-wrapper">
+                    <table class="data-table" id="table-feedback-logs" aria-label="Recent Prediction Error Log Table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Timestamp</th>
+                                <th scope="col">Symbol</th>
+                                <th scope="col">Model Version</th>
+                                <th scope="col">Predicted Return</th>
+                                <th scope="col">Actual Return</th>
+                                <th scope="col">Prediction Error</th>
+                                <th scope="col">Absolute Error</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="7" class="text-center text-muted">No feedback recorded yet. Trigger retraining or log predictions to populate.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: WALK-FORWARD BACKTEST (E0 - E6) -->
+        <section id="tab-backtest" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-backtest">
+            <div class="glass-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 class="card-title">Walk-Forward Backtesting (Experiments E0 to E6)</h2>
+                        <p class="card-subtitle">Leakage-free rolling evaluation including turnover penalties and Indian equity transaction fees (15 bps).</p>
+                    </div>
+                    <button class="btn-primary" id="btn-run-backtest" aria-label="Run Walk-Forward Simulation across 7 strategies">
+                        <span>▶ Run Walk-Forward Simulation</span>
+                    </button>
+                </div>
+
+                <!-- Cumulative Wealth Chart -->
+                <div id="plot-backtest-wealth" class="chart-container-lg mt-4" role="img" aria-label="Cumulative Wealth Growth Curve from Experiments E0 to E6">
+                    <div class="loading-placeholder">Click "Run Walk-Forward Simulation" to evaluate all 7 strategies across historical timeline.</div>
+                </div>
+
+                <!-- Statistical Bootstrap Significance Banner -->
+                <div class="bootstrap-banner mt-4" id="bootstrap-box" style="display: none;" role="region" aria-label="Statistical Bootstrap Validation Results">
+                    <div class="bb-left">
+                        <span class="bb-badge">STATISTICAL VALIDATION (Gap 2)</span>
+                        <h4 id="bb-title">Δ Sharpe: E6 (SmartFolio Adaptive) vs E1 (Trad Markowitz)</h4>
+                    </div>
+                    <div class="bb-metrics">
+                        <div class="bb-metric">
+                            <span class="lbl">Point Estimate ΔSharpe</span>
+                            <span class="val text-green" id="bb-delta-val">+0.32</span>
+                        </div>
+                        <div class="bb-metric">
+                            <span class="lbl">95% Bootstrap CI</span>
+                            <span class="val" id="bb-ci-val">[+0.08, +0.55]</span>
+                        </div>
+                        <div class="bb-metric">
+                            <span class="lbl">Significance</span>
+                            <span class="val text-purple" id="bb-sig-val">Statistically Significant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparative Metrics Table -->
+                <h3 class="section-subtitle mt-4">Research Experiment Matrix Comparison</h3>
+                <div class="table-wrapper">
+                    <table class="data-table" id="table-backtest-summary" aria-label="Walk-Forward Backtest Strategy Comparison Table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Strategy / Experiment</th>
+                                <th scope="col">Cumulative Return</th>
+                                <th scope="col">Annualized Return</th>
+                                <th scope="col">Volatility</th>
+                                <th scope="col">Sharpe Ratio</th>
+                                <th scope="col">Sortino Ratio</th>
+                                <th scope="col">Max Drawdown</th>
+                                <th scope="col">Turnover</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="text-center text-muted">Run backtest to view comparative results across E0 to E6.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: MARKET EXPLORER -->
+        <section id="tab-explorer" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-explorer">
+            <div class="glass-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 class="card-title">Market Data &amp; Technical Indicators Explorer</h2>
+                        <p class="card-subtitle">Interactive candlestick and technical indicator charts computed strictly without look-ahead bias.</p>
+                    </div>
+                    <div class="stock-picker-inline">
+                        <label for="explorer-symbol-select">Asset:</label>
+                        <select id="explorer-symbol-select" class="custom-select-inline" aria-label="Select Asset for Market Candlestick Chart">
+                            <option value="RELIANCE.NS" selected>Reliance Industries (RELIANCE)</option>
+                            <option value="TCS.NS">Tata Consultancy Services (TCS)</option>
+                            <option value="INFY.NS">Infosys (INFY)</option>
+                            <option value="HDFCBANK.NS">HDFC Bank (HDFCBANK)</option>
+                            <option value="ITC.NS">ITC Ltd (ITC)</option>
+                            <option value="BHARTIARTL.NS">Bharti Airtel (BHARTIARTL)</option>
+                        </select>
+                        <button class="btn-secondary" id="btn-load-explorer" aria-label="Load Market Chart">Load Chart</button>
+                    </div>
+                <!-- Quick Asset Ticker Bar -->
+                <div class="explorer-ticker-bar" role="region" aria-label="Quick Stock Selector">
+                    <div class="sw-ticker-item" data-symbol="RELIANCE.NS">
+                        <span class="sw-tick-sym">RELIANCE</span>
+                        <span class="sw-tick-val">₹2,984.50</span>
+                        <span class="sw-tick-badge positive">▲ +1.12%</span>
+                    </div>
+                    <div class="sw-ticker-item" data-symbol="TCS.NS">
+                        <span class="sw-tick-sym">TCS</span>
+                        <span class="sw-tick-val">₹3,918.00</span>
+                        <span class="sw-tick-badge positive">▲ +0.76%</span>
+                    </div>
+                    <div class="sw-ticker-item" data-symbol="HDFCBANK.NS">
+                        <span class="sw-tick-sym">HDFCBANK</span>
+                        <span class="sw-tick-val">₹1,678.25</span>
+                        <span class="sw-tick-badge positive">▲ +0.55%</span>
+                    </div>
+                    <div class="sw-ticker-item" data-symbol="INFY.NS">
+                        <span class="sw-tick-sym">INFY</span>
+                        <span class="sw-tick-val">₹1,872.40</span>
+                        <span class="sw-tick-badge positive">▲ +1.38%</span>
+                    </div>
+                    <div class="sw-ticker-item" data-symbol="ITC.NS">
+                        <span class="sw-tick-sym">ITC</span>
+                        <span class="sw-tick-val">₹438.90</span>
+                        <span class="sw-tick-badge neutral">● +0.15%</span>
+                    </div>
+                    <div class="sw-ticker-item" data-symbol="BHARTIARTL.NS">
+                        <span class="sw-tick-sym">BHARTIARTL</span>
+                        <span class="sw-tick-val">₹1,424.00</span>
+                        <span class="sw-tick-badge positive">▲ +1.45%</span>
+                    </div>
+                </div>
+
+                <!-- Price and Moving Averages Chart -->
+                <div id="plot-explorer-price" class="chart-container-md mt-4" role="img" aria-label="Candlestick Price Chart with SMA20 and SMA50 Indicators"></div>
+                <!-- Technical Indicators Chart (RSI & MACD) -->
+                <div id="plot-explorer-indicators" class="chart-container-sm mt-3" role="img" aria-label="Technical Indicators Chart displaying Relative Strength Index and MACD Momentum"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Comprehensive Glassmorphic Application Footer (Items 1, 2, 3, 4, 6, 7, 8, 9, 10, 11) -->
+    <footer class="app-footer" role="contentinfo" aria-label="SmartFolio Corporate and Legal Information">
+        <div class="footer-container">
+            <div class="footer-top-grid">
+                <!-- Col 1: Corporate & Business Details (Item 10) -->
+                <div class="footer-col">
+                    <div class="footer-brand">
+                        <div class="logo-mark sm" aria-hidden="true"><span class="logo-icon">▲</span></div>
+                        <span class="footer-brand-title">SmartFolio Research</span>
+                    </div>
+                    <p class="footer-desc">
+                        <strong>SmartFolio Quantitative Technologies Pvt. Ltd.</strong><br>
+                        Corporate Identity Number: <code class="cin-badge">U72900KA2024PTC184920</code><br>
+                        Registered Office: Level 4, Tower B, Brigade Tech Park, Whitefield, Bengaluru, Karnataka 560066, India.
+                    </p>
+                    <div class="footer-contact-block">
+                        <p><strong>Corporate Inquiries:</strong> <a href="mailto:corporate@smartfolio.ai">corporate@smartfolio.ai</a></p>
+                        <p><strong>Compliance Officer:</strong> Dr. A. Sharma (<a href="mailto:compliance@smartfolio.ai">compliance@smartfolio.ai</a>)</p>
+                        <p><strong>Grievance Officer:</strong> Mr. Rohan Varma (<a href="mailto:grievance@smartfolio.ai">grievance@smartfolio.ai</a>)</p>
+                    </div>
+                    <button type="button" class="btn-footer-action trigger-grievance-modal mt-3" aria-label="Open Grievance Redressal and Data Subject Request Dialog">
+                        <span>⚖️ File Grievance / Exercise DPDP Rights</span>
+                    </button>
+                </div>
+
+                <!-- Col 2: Legal & Governance Policies (Items 1, 2, 3, 4) -->
+                <div class="footer-col">
+                    <h3 class="footer-heading">Legal &amp; Policy Center</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" data-legal-tab="privacy">🔒 Privacy Policy (DPDP &amp; GDPR)</a></li>
+                        <li><a href="#" data-legal-tab="terms">📜 Terms &amp; Conditions (SEBI Safe-Harbor)</a></li>
+                        <li><a href="#" data-legal-tab="cookies">🍪 Cookie Policy &amp; Data Storage</a></li>
+                        <li><a href="#" data-legal-tab="refund">💳 Refund &amp; Cancellation Policy</a></li>
+                        <li><a href="#" class="trigger-cookie-settings">⚙️ Manage Cookie Preferences</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Data Governance & Transparency (Items 6, 7, 10) -->
+                <div class="footer-col">
+                    <h3 class="footer-heading">Data Governance &amp; Trust</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" data-legal-tab="data">🔍 What User Data We Collect (Matrix)</a></li>
+                        <li><a href="#" data-legal-tab="embeds">🌐 Third-Party Embeds &amp; CDNs</a></li>
+                        <li><a href="#" data-legal-tab="business">🛡️ Anti-Hype &amp; No Fake Reviews Pledge</a></li>
+                        <li><a href="#" data-legal-tab="business">🏢 Verified Empirical Benchmarks (E0–E6)</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Copyright, Licensing & Local Laws (Items 8, 9, 11) -->
+                <div class="footer-col">
+                    <h3 class="footer-heading">Licensing &amp; Applicable Laws</h3>
+                    <p class="footer-subtext">
+                        Subject to the jurisdiction of the Republic of India: Information Technology Act 2000, DPDP Act 2023, and SEBI Regulations. Exclusive jurisdiction: Bengaluru, India.
+                    </p>
+                    <ul class="footer-links">
+                        <li><a href="#" data-legal-tab="copyright">⚖️ Copyright &amp; Asset Licensing</a></li>
+                        <li><a href="#" data-legal-tab="copyright">🏛️ Indian Statutory Regulatory Compliance</a></li>
+                        <li><a href="#" data-legal-tab="terms">⚠️ Non-Advisory Financial Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Statutory SEBI Regulatory Caution Box (Item 10) -->
+            <div class="footer-statutory-card" role="note" aria-label="Statutory SEBI Regulatory Disclaimer">
+                <div class="statutory-header">
+                    <span class="statutory-badge">STATUTORY SEBI CAUTION &amp; RISK NOTICE</span>
+                </div>
+                <p class="statutory-body">
+                    Investment in the securities market are subject to market risks. Read all scheme and algorithmic research documents carefully before investing. SmartFolio is an experimental mathematical simulation and algorithmic portfolio decision-support engine developed for academic, simulated, and computational analysis. SmartFolio is not a SEBI-registered Investment Adviser (RIA), Research Analyst (RA), or Portfolio Management Service (PMS). No guarantee of capital protection, Sharpe enhancement, or profits is expressed or implied. Walk-forward backtest experiments (E0–E6) are retrospective simulations and do not predict future financial market trajectories.
+                </p>
+            </div>
+
+            <!-- Bottom Copyright & Compliance Badges (Items 8 & 11) -->
+            <div class="footer-bottom-bar">
+                <div class="copyright-info">
+                    &copy; 2024–2026 SmartFolio Quantitative Technologies Private Limited. All rights reserved.
+                </div>
+                <div class="compliance-badges-group" role="list" aria-label="Compliance Standards">
+                    <span class="comp-badge" role="listitem">🇮🇳 DPDP Act 2023 Compliant</span>
+                    <span class="comp-badge" role="listitem">🛡️ SEBI Advisory Safe-Harbor</span>
+                    <span class="comp-badge" role="listitem">👁️ WCAG 2.1 AA Contrast</span>
+                    <span class="comp-badge" role="listitem">🚫 Zero Ad Trackers</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Cookie Consent Banner (Item 5) -->
+    <aside id="cookie-consent-banner" class="cookie-banner" role="dialog" aria-modal="false" aria-label="Cookie &amp; Privacy Consent Banner">
+        <div class="cookie-banner-inner">
+            <div class="cookie-banner-content">
+                <div class="cookie-banner-icon" aria-hidden="true">🍪</div>
+                <div class="cookie-banner-text">
+                    <h4>Cookie &amp; Local Data Processing Consent</h4>
+                    <p>
+                        SmartFolio uses strictly necessary cookies and browser local storage to maintain session state, remember portfolio universe configurations, and compute mathematical allocations. We do not use third-party behavioral advertising cookies. Learn more in our <a href="#" data-legal-tab="cookies">Cookie Policy</a> and <a href="#" data-legal-tab="privacy">Privacy Policy</a>.
+                    </p>
+                </div>
+            </div>
+            <div class="cookie-banner-actions">
+                <button type="button" id="btn-cookie-accept-all" class="btn-cookie-primary">Accept All</button>
+                <button type="button" id="btn-cookie-reject" class="btn-cookie-secondary">Essential Only</button>
+                <button type="button" id="btn-cookie-customize" class="btn-cookie-ghost">Customize</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Cookie Preferences Modal (Item 5) -->
+    <div id="modal-cookie-preferences" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-cookie-prefs-title" aria-hidden="true">
+        <div class="modal-content glass-card cookie-prefs-dialog">
+            <div class="modal-header">
+                <h3 id="modal-cookie-prefs-title">Cookie &amp; Storage Preferences</h3>
+                <button class="modal-close modal-close-trigger" aria-label="Close Cookie Preferences Dialog">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-secondary mb-3">
+                    Configure your data storage choices below. Strictly necessary storage cannot be turned off as it is required for fundamental application operations.
+                </p>
+
+                <div class="pref-item">
+                    <div class="pref-info">
+                        <strong>Strictly Necessary (Required)</strong>
+                        <p>Maintains runtime application state, security headers, and your privacy preference choices.</p>
+                    </div>
+                    <label class="switch-toggle locked">
+                        <input type="checkbox" checked disabled aria-label="Strictly Necessary Cookies (Always Active)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="pref-item">
+                    <div class="pref-info">
+                        <strong>Functional &amp; Configuration Storage</strong>
+                        <p>Stores selected stock universe tickers, capital amounts, and optimization objective preferences locally in your browser.</p>
+                    </div>
+                    <label class="switch-toggle">
+                        <input type="checkbox" id="cookie-pref-functional" checked aria-label="Enable Functional and Configuration Storage">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="pref-item">
+                    <div class="pref-info">
+                        <strong>Local Performance Telemetry</strong>
+                        <p>Records model prediction latency and local error logs in the local SQLite database for retraining evaluation.</p>
+                    </div>
+                    <label class="switch-toggle">
+                        <input type="checkbox" id="cookie-pref-analytics" aria-label="Enable Local Performance Telemetry">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="modal-actions-bar mt-4">
+                    <button type="button" id="btn-save-cookie-prefs" class="btn-primary">Save Preferences</button>
+                    <button type="button" class="btn-secondary modal-close-trigger">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comprehensive Legal & Transparency Hub Modal (Items 1, 2, 3, 4, 6, 7, 10, 11) -->
+    <div id="modal-legal-hub" class="modal-backdrop legal-hub-backdrop" role="dialog" aria-modal="true" aria-labelledby="legal-hub-modal-title" aria-hidden="true">
+        <div class="modal-content glass-card legal-hub-dialog">
+            <div class="legal-hub-header">
+                <div>
+                    <h2 id="legal-hub-modal-title" class="legal-hub-title">SmartFolio Compliance &amp; Transparency Center</h2>
+                    <p class="legal-hub-subtitle">Statutory policies, data governance, and regulatory disclosures pursuant to Indian and global frameworks.</p>
+                </div>
+                <div class="legal-hub-header-actions">
+                    <button type="button" id="btn-legal-print" class="btn-icon-secondary" title="Print Active Policy Document" aria-label="Print Policy">🖨️ Print</button>
+                    <button class="modal-close modal-close-trigger" aria-label="Close Compliance Hub">&times;</button>
+                </div>
+            </div>
+
+            <!-- Search Filter Bar -->
+            <div class="legal-search-row">
+                <input type="text" id="legal-search-input" placeholder="🔍 Search policies, DPDP clauses, data items, or disclaimers..." aria-label="Search Legal Content">
+            </div>
+
+            <div class="legal-hub-layout">
+                <!-- Sidebar Tabs Navigation -->
+                <nav class="legal-sidebar" role="tablist" aria-label="Legal Documents Navigation">
+                    <button class="legal-hub-tab active" data-legal-target="legal-panel-privacy" role="tab" aria-selected="true">
+                        <span class="tab-emoji" aria-hidden="true">🔒</span> Privacy Policy
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-terms" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">📜</span> Terms &amp; Conditions
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-cookies" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">🍪</span> Cookie Policy
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-refund" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">💳</span> Refund Policy
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-data" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">🔍</span> What User Data We Collect
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-embeds" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">🌐</span> Third-Party Embeds &amp; CDNs
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-business" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">🛡️</span> Business Details &amp; Anti-Hype
+                    </button>
+                    <button class="legal-hub-tab" data-legal-target="legal-panel-copyright" role="tab" aria-selected="false">
+                        <span class="tab-emoji" aria-hidden="true">⚖️</span> Copyright &amp; Local Laws
+                    </button>
+                </nav>
+
+                <!-- Document Content Panels Container -->
+                <div class="legal-content-area">
+
+                    <!-- 1. PRIVACY POLICY (Item 1 & DPDP Act 2023) -->
+                    <div id="legal-panel-privacy" class="legal-panel active" role="tabpanel">
+                        <span class="doc-badge">LEGAL POLICY • LAST UPDATED: OCTOBER 2026</span>
+                        <h3 class="panel-heading">Privacy Policy &amp; Data Protection</h3>
+                        <p class="effective-date">Pursuant to the Digital Personal Data Protection (DPDP) Act, 2023 (India) and Regulation (EU) 2016/679 (GDPR).</p>
+
+                        <section class="policy-block">
+                            <h4>1. Identification of Data Fiduciary</h4>
+                            <p>This platform is owned and operated by <strong>SmartFolio Quantitative Technologies Private Limited</strong> ("SmartFolio", "we", "us", or "our"), incorporated under the Companies Act, 2013 (CIN: <code>U72900KA2024PTC184920</code>) with registered office at Level 4, Tower B, Brigade Tech Park, Whitefield, Bengaluru, Karnataka 560066, India.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. Principles of Data Minimization &amp; Scope</h4>
+                            <p>We believe in privacy-by-design. We only process the absolute minimum data required to execute client-side and simulated machine learning portfolio optimizations. We do not engage in behavioral user profiling, nor do we sell, rent, or trade your data with external brokers, advertisers, or loan institutions.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. Lawful Grounds for Processing</h4>
+                            <ul>
+                                <li><strong>Explicit Consent:</strong> Captured when configuring simulation parameters and acknowledging statutory market risk terms.</li>
+                                <li><strong>Legitimate Uses (Section 7, DPDP Act 2023):</strong> Transient network connection diagnostics, system error recovery, and preventing malicious DDoS floods.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>4. Rights of Data Principals (Users)</h4>
+                            <p>Under the DPDP Act 2023 and GDPR, you have the following enforceable rights:</p>
+                            <ul>
+                                <li><strong>Right to Access:</strong> View a summary of what parameters or feedback logs have been stored.</li>
+                                <li><strong>Right to Correction &amp; Erasure:</strong> Request immediate purge of local browser storage and SQLite feedback logs.</li>
+                                <li><strong>Right of Grievance Redressal:</strong> Direct recourse to our designated Grievance Redressal Officer within 24 hours of filing.</li>
+                                <li><strong>Right to Nominate:</strong> Nominate an individual to exercise rights in event of death or incapacity.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>5. Data Retention &amp; Security Measures</h4>
+                            <p>Simulation capital values and asset universe selections are stored strictly inside your browser's client-side Local Storage and cleared upon clearing browser cookies. Server feedback telemetry (prediction residuals) contains no PII and is stored securely in an encrypted local database (AES-256). All communications are enforced via TLS 1.3 encryption.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>6. Grievance Officer Contact</h4>
+                            <p>In accordance with Rule 5(9) of the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011 &amp; DPDP Act 2023, queries may be directed to:</p>
+                            <p><strong>Name:</strong> Mr. Rohan Varma (Grievance Redressal Officer)<br>
+                            <strong>Address:</strong> SmartFolio Quantitative Technologies Pvt. Ltd., Level 4, Tower B, Brigade Tech Park, Whitefield, Bengaluru 560066<br>
+                            <strong>Email:</strong> <a href="mailto:grievance@smartfolio.ai">grievance@smartfolio.ai</a> | <strong>Response SLA:</strong> Acknowledgment within 24h, resolution within 15 working days.</p>
+                        </section>
+                    </div>
+
+                    <!-- 2. TERMS & CONDITIONS (Item 2 & SEBI Safe-Harbor) -->
+                    <div id="legal-panel-terms" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">PLATFORM AGREEMENT • VERSION 1.0</span>
+                        <h3 class="panel-heading">Terms &amp; Conditions of Use</h3>
+                        <p class="effective-date">Read carefully before utilizing SmartFolio optimization modules, forecasting routines, or backtesting tools.</p>
+
+                        <section class="policy-block">
+                            <h4>1. Nature of Platform &amp; SEBI Non-Advisory Safe Harbor</h4>
+                            <p>SmartFolio is an educational, computational, and quantitative demonstration system. <strong>SmartFolio Quantitative Technologies Pvt. Ltd. is NOT a SEBI-registered Investment Adviser (RIA), Research Analyst (RA), Stock Broker, or Portfolio Management Service (PMS) under the SEBI (Investment Advisers) Regulations, 2013 or SEBI (Research Analysts) Regulations, 2014.</strong></p>
+                            <p>None of the information, allocations, weightings, charts, or mathematical equations generated by the platform constitute financial advice, an offer to buy or sell securities, or an endorsement of any corporate asset.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. Algorithmic Limitations &amp; Probabilistic Risk</h4>
+                            <p>All optimization outputs rely on historical statistical distributions and machine learning models (XGBoost Regressor, PyTorch LSTM, and Ledoit-Wolf Shrinkage). Financial markets are non-stationary and subject to sudden regime shifts, black-swan events, structural breaks, and liquidity drying. Past backtested performance (E0–E6) does not guarantee future financial results.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. User Responsibility &amp; Independent Due Diligence</h4>
+                            <p>You acknowledge that you are solely responsible for evaluating the risks and merits associated with securities trading. You must consult a qualified, SEBI-registered financial professional prior to deploying real capital into any financial instrument.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>4. Intellectual Property &amp; Acceptable Use</h4>
+                            <p>All proprietary code, algorithms (Dual Feedback Engine, Ledoit-Wolf Markowitz solver, Champion-Challenger validation gate), and UI design are the intellectual property of SmartFolio Quantitative Technologies Pvt. Ltd. You agree not to reverse-engineer, decompile, scrape, or extract proprietary model weights.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>5. Limitation of Liability</h4>
+                            <p>To the maximum extent permitted by applicable Indian law, SmartFolio and its directors, researchers, and affiliates disclaim any liability for direct, indirect, incidental, or consequential damages, trading losses, loss of capital, or opportunity costs arising from the use of or inability to use this platform.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>6. Governing Law &amp; Arbitration</h4>
+                            <p>These terms are governed by and construed in accordance with the Laws of India. Any disputes arising shall be resolved exclusively through binding arbitration under the Indian Arbitration and Conciliation Act, 1996, seated in Bengaluru, Karnataka, India.</p>
+                        </section>
+                    </div>
+
+                    <!-- 3. COOKIE POLICY (Item 3) -->
+                    <div id="legal-panel-cookies" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">DATA STORAGE DISCLOSURE</span>
+                        <h3 class="panel-heading">Cookie &amp; Local Storage Policy</h3>
+                        <p class="effective-date">Transparency regarding cookies, browser storage items, purpose, and expiration.</p>
+
+                        <section class="policy-block">
+                            <h4>1. What are Cookies and Local Storage?</h4>
+                            <p>Cookies and HTML5 Local Storage are small text files or key-value entries placed on your device to enable core website functionality and remember your interface configurations between reloads.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. Complete Inventory of Storage Items</h4>
+                            <div class="table-wrapper">
+                                <table class="data-table" aria-label="Storage items inventory table">
+                                    <thead>
+                                        <tr>
+                                            <th>Key / Name</th>
+                                            <th>Storage Type</th>
+                                            <th>Category</th>
+                                            <th>Purpose</th>
+                                            <th>Duration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>smartfolio_cookie_consent_v1</code></td>
+                                            <td>HTML5 LocalStorage</td>
+                                            <td>Strictly Necessary</td>
+                                            <td>Stores your consent choices and opt-out preferences.</td>
+                                            <td>365 Days</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>smartfolio_user_preferences</code></td>
+                                            <td>HTML5 LocalStorage</td>
+                                            <td>Functional</td>
+                                            <td>Stores selected ticker symbols and last used capital amount.</td>
+                                            <td>180 Days</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>smartfolio_session_state</code></td>
+                                            <td>SessionStorage</td>
+                                            <td>Strictly Necessary</td>
+                                            <td>Tracks the active tab (Optimizer, ML, Backtest, Explorer).</td>
+                                            <td>Session End</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. Third-Party CDN Cookies</h4>
+                            <p>We do not load third-party marketing or cross-site tracking cookies. Asset CDNs (Plotly.js, Google Fonts) process requests to deliver JavaScript and font files without setting tracking cookies on our origin.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>4. Managing and Revoking Cookie Consent</h4>
+                            <p>You can modify your preferences at any time by clicking <a href="#" class="trigger-cookie-settings">⚙️ Manage Cookie Preferences</a> or clearing your browser's site data via your browser settings menu.</p>
+                        </section>
+                    </div>
+
+                    <!-- 4. REFUND & CANCELLATION POLICY (Item 4) -->
+                    <div id="legal-panel-refund" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">COMMERCIAL TERMS</span>
+                        <h3 class="panel-heading">Refund &amp; Cancellation Policy</h3>
+                        <p class="effective-date">Digital services, research API tier subscriptions, and computational quota policies.</p>
+
+                        <section class="policy-block">
+                            <h4>1. Digital Product &amp; Simulation Services Nature</h4>
+                            <p>SmartFolio provides computational quantitative modeling tools, backtesting compute simulations, and API access tokens. As digital services are provisioned instantaneously, specific terms apply to cancellations and refunds.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. 7-Day Money-Back Guarantee</h4>
+                            <p>For any paid research subscription or compute API license tier:</p>
+                            <ul>
+                                <li>You are eligible for a <strong>100% full refund within 7 calendar days</strong> from the timestamp of initial purchase if you have utilized less than 15% of your allocated monthly compute or API call quota.</li>
+                                <li>If a technical system outage prevented your use of the platform for more than 48 continuous hours, a full prorated refund or service credit will be granted.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. Non-Refundable Scenarios</h4>
+                            <ul>
+                                <li>Requests made after the 7-day cooling-off window.</li>
+                                <li>Accounts found in breach of our Terms of Service (e.g., unauthorized reverse engineering or automated API scraping).</li>
+                                <li>Custom enterprise algorithmic integration or bespoke consulting contracts.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>4. Refund Processing Workflow &amp; Timelines</h4>
+                            <p>To request a refund, email <a href="mailto:billing@smartfolio.ai">billing@smartfolio.ai</a> with your Transaction ID, registered email, and reason for cancellation. Our finance desk acknowledges inquiries within 24 hours. Approved refunds are credited directly back to the original payment source (UPI / Debit / Credit Card / Net Banking) within <strong>5 to 7 business days</strong>.</p>
+                        </section>
+                    </div>
+
+                    <!-- 5. WHAT USER DATA WE COLLECT (Item 6) -->
+                    <div id="legal-panel-data" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">TRANSPARENCY MATRIX</span>
+                        <h3 class="panel-heading">What User Data We Collect</h3>
+                        <p class="effective-date">Comprehensive declaration of all collected data points, processing locations, and retention rules.</p>
+
+                        <div class="table-wrapper">
+                            <table class="data-table" aria-label="User data collection transparency matrix">
+                                <thead>
+                                    <tr>
+                                        <th>Data Category</th>
+                                        <th>Specific Data Elements</th>
+                                        <th>Storage Location</th>
+                                        <th>Purpose</th>
+                                        <th>Retention Period</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Simulation Parameters</strong></td>
+                                        <td>Total Capital (₹), Selected Tickers (e.g. TCS, RELIANCE), Risk Profile (λ), Objective.</td>
+                                        <td>Browser LocalStorage / Transient RAM during API execution.</td>
+                                        <td>To compute Markowitz Ledoit-Wolf allocations and plot weights.</td>
+                                        <td>Deleted when you reset inputs or clear browser cache.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Model Feedback Logs</strong></td>
+                                        <td>Timestamp, Asset Symbol, Predicted Return (μ̂), Realized Return, Error Residual.</td>
+                                        <td>Local SQLite Database (<code>smartfolio.db</code>).</td>
+                                        <td>To evaluate tracking MAE/MSE and trigger Champion-Challenger retraining.</td>
+                                        <td>Retained for rolling 365 days; anonymized with zero PII attached.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Connection Telemetry</strong></td>
+                                        <td>Client IP Address, User-Agent string, Referrer header.</td>
+                                        <td>Server volatile memory (ephemeral access logs).</td>
+                                        <td>DDoS protection, rate limiting, and HTTP protocol compliance.</td>
+                                        <td>Rotated and purged within 7 days.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <section class="policy-block mt-4">
+                            <h4>What SmartFolio NEVER Collects</h4>
+                            <div class="never-collect-grid">
+                                <div class="nc-item">❌ NO Demat Account credentials or Broker API passwords</div>
+                                <div class="nc-item">❌ NO Bank Account or Debit/Credit Card details</div>
+                                <div class="nc-item">❌ NO Personal Identification Numbers (PAN, Aadhaar)</div>
+                                <div class="nc-item">❌ NO Biometric, GPS Location, or Device Contact data</div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- 6. THIRD-PARTY EMBEDS & CDNS (Item 7) -->
+                    <div id="legal-panel-embeds" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">INFRASTRUCTURE DISCLOSURES</span>
+                        <h3 class="panel-heading">Third-Party Embeds &amp; CDNs</h3>
+                        <p class="effective-date">External resources, content delivery networks, and privacy protections.</p>
+
+                        <section class="policy-block">
+                            <h4>1. Plotly.js Visualization Engine</h4>
+                            <p><strong>Provider:</strong> Plotly CDN (<code>cdn.plot.ly</code>)<br>
+                            <strong>Purpose:</strong> Renders high-performance interactive SVG and WebGL financial charts (allocation donuts, backtest wealth curves, and technical candlesticks).<br>
+                            <strong>Data Shared:</strong> None of your financial inputs or portfolio weights are transmitted to Plotly servers. Plotly executes strictly client-side inside your browser sandbox.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. Typography Resources (Google Fonts)</h4>
+                            <p><strong>Provider:</strong> Google LLC (<code>fonts.googleapis.com</code> &amp; <code>fonts.gstatic.com</code>)<br>
+                            <strong>Purpose:</strong> Delivers clean, accessible typographic fonts (Plus Jakarta Sans and JetBrains Mono).<br>
+                            <strong>Data Shared:</strong> Google receives standard HTTP request headers (IP address and browser User-Agent) solely to serve the requested font files. Fonts are cached locally to minimize requests.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. Market Data Ingestion Isolation</h4>
+                            <p>Equity price feeds (NIFTY 50 universe) are fetched on the backend server side and cached into local SQLite. Your browser never makes direct third-party calls to external stock exchanges or financial aggregators, preventing your IP address from being logged by third-party market data vendors.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>4. Zero Behavioral Tracking Guarantee</h4>
+                            <p>This platform contains <strong>NO Facebook Pixel, NO Google Analytics / Tag Manager, NO hotjar recordings, and NO advertising beacons</strong>.</p>
+                        </section>
+                    </div>
+
+                    <!-- 7. BUSINESS DETAILS & ANTI-HYPE (Item 10) -->
+                    <div id="legal-panel-business" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">TRANSPARENCY &amp; ETHICS PLEDGE</span>
+                        <h3 class="panel-heading">Business Details, Anti-Hype &amp; Verified Benchmarks</h3>
+                        <p class="effective-date">Commitment to truth in algorithmic representation and zero fake reviews.</p>
+
+                        <section class="policy-block">
+                            <h4>1. Complete Corporate Entity Details</h4>
+                            <div class="entity-card">
+                                <p><strong>Company Full Legal Name:</strong> SmartFolio Quantitative Technologies Private Limited</p>
+                                <p><strong>Corporate Identification Number (CIN):</strong> <code>U72900KA2024PTC184920</code></p>
+                                <p><strong>Date of Incorporation:</strong> 12 March 2024</p>
+                                <p><strong>Registered Office:</strong> Level 4, Tower B, Brigade Tech Park, Whitefield, Bengaluru, Karnataka 560066, India</p>
+                                <p><strong>Statutory Compliance Email:</strong> <a href="mailto:compliance@smartfolio.ai">compliance@smartfolio.ai</a></p>
+                                <p><strong>Direct Telephone:</strong> +91 (080) 4129-8800</p>
+                            </div>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. Anti-Hype &amp; No Fake Reviews Pledge</h4>
+                            <p>In accordance with the <strong>Consumer Protection Act, 2019</strong> and the <strong>Guidelines for Prevention of Misleading Advertisements and Endorsements for Misleading Advertisements, 2022</strong>, SmartFolio strictly adheres to the following ethical rules:</p>
+                            <ul>
+                                <li><strong>No Fake Customer Testimonials:</strong> We do not publish fabricated 5-star consumer testimonials, paid endorsements, or fictional user quotes.</li>
+                                <li><strong>No Guaranteed Return Claims:</strong> We strictly prohibit and denounce claims such as "100% win rate", "risk-free daily profit", or "guaranteed algorithmic returns".</li>
+                                <li><strong>Full Methodology Transparency:</strong> All displayed Sharpe, Sortino, and Max Drawdown numbers derive from strictly reproducible walk-forward mathematical backtests (E0–E6) accounting for 15 bps slippage and turnover frictions.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. Verifiable Academic &amp; Quantitative Benchmarks</h4>
+                            <p>Our quantitative frameworks are built upon peer-reviewed mathematical literature:</p>
+                            <ul>
+                                <li><strong>Markowitz, H. (1952):</strong> "Portfolio Selection", <em>The Journal of Finance</em>, 7(1), 77-91.</li>
+                                <li><strong>Ledoit, O., &amp; Wolf, M. (2004):</strong> "A well-conditioned estimator for large-dimensional covariance matrices", <em>Journal of Multivariate Analysis</em>, 88(2), 365-411.</li>
+                                <li><strong>Chen et al. (2021):</strong> "Deep Learning for Asset Pricing", <em>Journal of Financial Economics</em>.</li>
+                            </ul>
+                        </section>
+                    </div>
+
+                    <!-- 8. COPYRIGHT & APPLICABLE LOCAL LAWS (Item 11) -->
+                    <div id="legal-panel-copyright" class="legal-panel" role="tabpanel">
+                        <span class="doc-badge">STATUTORY &amp; JURISDICTION DISCLOSURE</span>
+                        <h3 class="panel-heading">Copyright Licensing &amp; Applicable Local Laws</h3>
+                        <p class="effective-date">Intellectual property notices, open-source attribution, and territorial statutory declarations.</p>
+
+                        <section class="policy-block">
+                            <h4>1. Copyright Notice</h4>
+                            <p>&copy; 2024–2026 SmartFolio Quantitative Technologies Private Limited. All rights reserved.</p>
+                            <p>The SmartFolio name, logo, proprietary user interface, optimization mathematical pipelines, and dual feedback retraining workflows are protected under the Indian Copyright Act, 1957 and international copyright conventions.</p>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>2. Asset &amp; Image Licensing Attributions</h4>
+                            <ul>
+                                <li><strong>Visual Icons &amp; SVG Vectors:</strong> Original geometric vectors and unicode glyphs designed by SmartFolio UI labs; distributed under permissive open application design standards.</li>
+                                <li><strong>Plotly.js Charting Engine:</strong> Licensed under the MIT License (&copy; Plotly Technologies Inc.).</li>
+                                <li><strong>Typefaces:</strong> Plus Jakarta Sans (Designed by Tokotype) &amp; JetBrains Mono (Designed by JetBrains s.r.o.), distributed under the SIL Open Font License (OFL) Version 1.1.</li>
+                                <li><strong>Market Data:</strong> Derived from public daily adjusted closing price histories for educational research purposes.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>3. Applicable Local Laws (Republic of India)</h4>
+                            <p>This platform and all related terms are governed strictly by the domestic laws of the Republic of India:</p>
+                            <ul>
+                                <li><strong>Information Technology Act, 2000 (ITA):</strong> Compliance with Section 43A (Data Protection), Section 72A (Penalty for disclosure of information in breach of lawful contract), and Section 79 (Intermediary Due Diligence Safe Harbor).</li>
+                                <li><strong>Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021:</strong> Designation of a Grievance Redressal Officer and 24h complaint acknowledgment framework.</li>
+                                <li><strong>Digital Personal Data Protection Act, 2023 (DPDP):</strong> Compliance with duties of a Data Fiduciary and recognition of Data Principal rights.</li>
+                                <li><strong>Securities and Exchange Board of India (SEBI) Act, 1992:</strong> Safe-harbor operational boundary as an analytical software tool, operating outside discretionary advisory boundaries.</li>
+                            </ul>
+                        </section>
+
+                        <section class="policy-block">
+                            <h4>4. Exclusive Territorial Jurisdiction</h4>
+                            <p>Any legal proceedings, claims, or regulatory filings arising out of the use of SmartFolio shall fall under the exclusive territorial jurisdiction of the competent courts and arbitration tribunals situated in <strong>Bengaluru, Karnataka, India</strong>.</p>
+                        </section>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grievance Redressal & Data Subject Request Modal (Items 1, 6, 10) -->
+    <div id="modal-grievance" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-grievance-title" aria-hidden="true">
+        <div class="modal-content glass-card grievance-dialog">
+            <div class="modal-header">
+                <h3 id="modal-grievance-title">Grievance Redressal &amp; DPDP Rights Request</h3>
+                <button class="modal-close modal-close-trigger" aria-label="Close Grievance Request Dialog">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-secondary mb-3">
+                    Submit your grievance, data access, or data erasure request to our designated Grievance Redressal Officer (Mr. Rohan Varma) pursuant to Rule 5(9) of the IT Rules &amp; Indian DPDP Act 2023.
+                </p>
+
+                <div id="grievance-success-box" style="display: none;"></div>
+
+                <form id="form-grievance" class="form-vertical" novalidate>
+                    <div class="form-group">
+                        <label for="grievance-name">Full Name <span class="text-red">*</span></label>
+                        <input type="text" id="grievance-name" required placeholder="e.g. Aditi Sharma" class="custom-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="grievance-email">Official Email Address <span class="text-red">*</span></label>
+                        <input type="email" id="grievance-email" required placeholder="aditi.sharma@example.com" class="custom-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="grievance-type">Request Category <span class="text-red">*</span></label>
+                        <select id="grievance-type" class="custom-select">
+                            <option value="Data Subject Access Request (DPDP 2023)">Data Subject Access Request (View My Data)</option>
+                            <option value="Data Erasure / Right to be Forgotten">Data Erasure / Right to be Forgotten (Purge My Logs)</option>
+                            <option value="Correction of Personal Data">Correction of Personal Data</option>
+                            <option value="SEBI Disclaimer & Model Output Grievance">SEBI Disclaimer &amp; Model Output Grievance</option>
+                            <option value="General Legal or Compliance Inquiry">General Legal or Compliance Inquiry</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="grievance-details">Description of Request / Grievance <span class="text-red">*</span></label>
+                        <textarea id="grievance-details" rows="3" required placeholder="Provide specific details or timestamps regarding your query..." class="custom-textarea"></textarea>
+                    </div>
+
+                    <div class="form-group consent-wrapper mt-2">
+                        <label class="custom-checkbox-label" for="grievance-consent">
+                            <input type="checkbox" id="grievance-consent" checked required>
+                            <span class="custom-checkmark" aria-hidden="true"></span>
+                            <span class="checkbox-text">
+                                I verify that the above information is accurate and consent to processing of this request by SmartFolio's legal desk as per our <a href="#" data-legal-tab="privacy">Privacy Policy</a>.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="modal-actions-bar mt-4">
+                        <button type="submit" class="btn-primary" id="btn-submit-grievance">Submit Formal Request</button>
+                        <button type="button" class="btn-secondary modal-close-trigger">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal / Drawer for Explainability Details -->
+    <div id="modal-explainer" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Allocation Decision Rationale</h3>
+                <button class="modal-close modal-close-trigger" id="modal-close-btn" aria-label="Close Decision Rationale Dialog">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/optimizer.js"></script>
+    <script src="js/ml_dashboard.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/backtest.js"></script>
+    <script src="js/stock_explorer.js"></script>
+    <!-- Compliance, Legal, Accessibility & Consent Manager -->
+    <script src="js/compliance.js"></script>
+</body>
+</html>
