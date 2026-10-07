@@ -23,7 +23,7 @@ class PortfolioOptimizeRequest(BaseModel):
     total_capital: float = Field(default=100000.0, ge=1000.0)
     strategy: str = Field(default="max_sharpe", description="max_sharpe | min_volatility | risk_aware")
     risk_profile: str = Field(default="moderate", description="conservative | moderate | aggressive")
-    model_name: str = Field(default="ensemble", description="baseline | xgboost | lstm | ensemble")
+    model_name: str = Field(default="xgboost", description="baseline | xgboost | lstm")
 
 class AssetAllocation(BaseModel):
     symbol: str
@@ -53,20 +53,3 @@ class ModelComparisonResponse(BaseModel):
     best_model: str
     metrics: Dict[str, Dict[str, float]]
     feature_importance: Dict[str, float]
-
-# Feedback Schemas
-class PredictionFeedbackRequest(BaseModel):
-    symbol: str
-    prediction_date: str
-    predicted_return: float
-    actual_return: float
-
-class RetrainRequest(BaseModel):
-    symbol: str = "TCS.NS"
-
-# Backtest Schemas
-class BacktestRequest(BaseModel):
-    symbols: Optional[List[str]] = None
-    start_date: str = "2021-01-01"
-    rebalance_days: int = 21
-    lookback_window_days: int = 252

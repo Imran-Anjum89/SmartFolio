@@ -30,8 +30,7 @@ async function loadMLComparison() {
         const modelDisplayNames = {
             "baseline": "Historical Mean (Baseline)",
             "xgboost": "XGBoost Regressor",
-            "lstm": "PyTorch LSTM Regressor",
-            "ensemble": "XGBoost + LSTM Ensemble"
+            "lstm": "PyTorch LSTM Regressor"
         };
 
         for (const [mKey, metrics] of Object.entries(data.metrics)) {

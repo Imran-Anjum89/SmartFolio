@@ -11,7 +11,6 @@ from config.settings import FEATURE_COLUMNS, FORECAST_HORIZON_DAYS, RANDOM_SEED
 from ml.models.baseline import HistoricalMeanBaseline
 from ml.models.xgboost_model import SmartFolioXGBoost
 from ml.models.lstm_model import SmartFolioLSTM
-from ml.models.ensemble import SmartFolioEnsemble
 from ml.evaluation.evaluate import compute_prediction_metrics
 from backend.app.services.feature_service import FeatureService
 
@@ -22,7 +21,7 @@ class MLService:
         self.feature_service = feature_service or FeatureService()
         self.models_cache: Dict[str, Dict[str, Any]] = {}
         self.current_model_version: str = "v1.0"
-        self.active_model_name: str = "ensemble"  # default champion candidate
+        self.active_model_name: str = "xgboost"  # Default model for Weeks 1-6
 
     def train_models_for_symbol(
         self,
@@ -31,7 +30,7 @@ class MLService:
         train_ratio: float = 0.8
     ) -> Dict[str, Any]:
         """
-        Train Baseline, XGBoost, LSTM, and Ensemble for a given symbol using strict time-series split.
+        Train Baseline, XGBoost, and PyTorch LSTM for a given symbol using strict time-series split.
         Returns trained models, evaluation metrics, and feature importances.
         """
         df_feat = self.feature_service.build_features_for_stock(df_raw, include_target=True)
@@ -52,32 +51,26 @@ class MLService:
         X_val, y_val = val_df[FEATURE_COLUMNS], val_df[target_col]
         X_test, y_test = test_df[FEATURE_COLUMNS], test_df[target_col]
 
-        # 1. Historical Mean Baseline
+        # 1. Historical Mean Baseline (Week 4)
         base_model = HistoricalMeanBaseline().fit(X_train, y_train)
         base_preds = base_model.predict(X_test)
         base_metrics = compute_prediction_metrics(y_test.values, base_preds)
 
-        # 2. XGBoost
+        # 2. XGBoost Regressor (Week 5)
         xgb_model = SmartFolioXGBoost().fit(X_train, y_train)
         xgb_preds = xgb_model.predict(X_test)
         xgb_metrics = compute_prediction_metrics(y_test.values, xgb_preds)
 
-        # 3. PyTorch LSTM
+        # 3. PyTorch LSTM (Week 6)
         lstm_model = SmartFolioLSTM(epochs=18).fit(X_train, y_train)
         lstm_preds = lstm_model.predict(X_test)
         lstm_metrics = compute_prediction_metrics(y_test.values, lstm_preds)
-
-        # 4. Ensemble
-        ensemble_model = SmartFolioEnsemble().fit(X_train, y_train, X_val, y_val)
-        ens_preds = ensemble_model.predict(X_test)
-        ens_metrics = compute_prediction_metrics(y_test.values, ens_preds)
 
         # Determine best performing model on test set
         models_eval = {
             "baseline": base_metrics["rmse"],
             "xgboost": xgb_metrics["rmse"],
-            "lstm": lstm_metrics["rmse"],
-            "ensemble": ens_metrics["rmse"]
+            "lstm": lstm_metrics["rmse"]
         }
         best_model_name = min(models_eval, key=models_eval.get)
 
@@ -87,14 +80,12 @@ class MLService:
             "models": {
                 "baseline": base_model,
                 "xgboost": xgb_model,
-                "lstm": lstm_model,
-                "ensemble": ensemble_model
+                "lstm": lstm_model
             },
             "metrics": {
                 "baseline": base_metrics,
                 "xgboost": xgb_metrics,
-                "lstm": lstm_metrics,
-                "ensemble": ens_metrics
+                "lstm": lstm_metrics
             },
             "best_model": best_model_name,
             "feature_importance": xgb_model.get_feature_importance(),
@@ -107,7 +98,7 @@ class MLService:
     def predict_expected_returns(
         self,
         symbols_data: Dict[str, pd.DataFrame],
-        model_name: str = "ensemble"
+        model_name: str = "xgboost"
     ) -> Dict[str, float]:
         """
         Generate expected return forecasts mu_hat for each asset using the specified model.
@@ -121,7 +112,7 @@ class MLService:
             bundle = self.models_cache[symbol]
             latest_feat = bundle["latest_features"]
             
-            selected_model = bundle["models"].get(model_name, bundle["models"]["ensemble"])
+            selected_model = bundle["models"].get(model_name, bundle["models"]["xgboost"])
             pred_5d = float(selected_model.predict(latest_feat)[0])
             
             # Annualize the 5-day return prediction: (1 + r_5d)^(252 / 5) - 1

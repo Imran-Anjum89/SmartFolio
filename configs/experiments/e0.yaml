@@ -1,0 +1,8 @@
+id: "E0"
+name: "Equal Weight"
+description: "Naive 1/N allocation benchmark"
+model: "none"
+covariance: "none"
+cost_aware_optimization: false
+feedback_adaptation: false
+weights_rule: "equal_weight"

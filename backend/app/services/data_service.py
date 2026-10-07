@@ -130,6 +130,38 @@ class MarketDataService:
         })
         return df
 
+    def get_point_in_time_universe(self, as_of_date: str) -> List[Dict]:
+        """
+        Return point-in-time eligible constituents at as_of_date (Section 6.2).
+        Guarantees Universe(t) prevents survivorship bias by honoring effective dates.
+        """
+        target_dt = pd.to_datetime(as_of_date)
+        eligible = []
+        for asset in self.universe_config.get("assets", []):
+            eff_from = pd.to_datetime(asset.get("effective_from", "2010-01-01"))
+            eff_to = pd.to_datetime(asset.get("effective_to")) if asset.get("effective_to") else None
+            if eff_from <= target_dt and (eff_to is None or eff_to >= target_dt):
+                eligible.append(asset)
+        return eligible
+
+    def fetch_benchmark_data(
+        self,
+        symbol: str = "^NSEI",
+        start_date: str = "2020-01-01",
+        end_date: Optional[str] = None
+    ) -> Tuple[pd.DataFrame, str]:
+        """Fetch NIFTY 50 benchmark market index data."""
+        return self.fetch_stock_data(symbol, start_date=start_date, end_date=end_date)
+
+    def fetch_vix_data(
+        self,
+        symbol: str = "^INDIAVIX",
+        start_date: str = "2020-01-01",
+        end_date: Optional[str] = None
+    ) -> Tuple[pd.DataFrame, str]:
+        """Fetch India VIX market volatility index data."""
+        return self.fetch_stock_data(symbol, start_date=start_date, end_date=end_date)
+
     def fetch_universe_data(
         self,
         symbols: Optional[List[str]] = None,

@@ -23,5 +23,5 @@ def get_db():
 
 def init_db():
     """Create all database tables."""
-    from backend.app.models.db_models import PortfolioRecord, PortfolioAssetRecord, StockPredictionRecord, ModelFeedbackRecord, ModelPromotionRecord
+    from backend.app.models.db_models import PortfolioRecord, PortfolioAssetRecord, StockPredictionRecord
     Base.metadata.create_all(bind=engine)

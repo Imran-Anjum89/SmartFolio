@@ -48,10 +48,6 @@ FEATURE_COLUMNS = [
     "volatility_63d"
 ]
 
-# Retraining Cadence Configuration
-RETRAIN_INTERVAL_DAYS = 21       # Retrain model periodically every 21 trading days (monthly)
-MIN_FEEDBACK_OBSERVATIONS = 30    # Minimum new feedback samples before candidate retraining
-
 # Portfolio Constraints
 W_MIN = 0.0                      # No short selling
 W_MAX = 0.40                     # Maximum allocation per asset (40% cap)

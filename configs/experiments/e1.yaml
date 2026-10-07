@@ -1,0 +1,8 @@
+id: "E1"
+name: "Traditional Markowitz"
+description: "Classical Markowitz (Historical Mean Return + Sample Covariance)"
+model: "historical_mean"
+covariance: "sample"
+cost_aware_optimization: false
+feedback_adaptation: false
+objective: "max_sharpe"

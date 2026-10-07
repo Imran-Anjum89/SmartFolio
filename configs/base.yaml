@@ -1,0 +1,75 @@
+# SmartFolio Base Configuration
+# Frozen research baseline for Indian equities (NIFTY 50)
+
+project:
+  name: "SmartFolio"
+  version: "2026.1"
+  market: "NSE_NIFTY50"
+  random_seed: 42
+
+data:
+  universe_file: "config/universe.json"
+  benchmark_symbol: "^NSEI"
+  vix_symbol: "^INDIAVIX"
+  history_start: "2010-01-01"
+  frequency: "1D"
+  horizons: [1, 5, 20]  # Multi-horizon forecast targets (trading days)
+  primary_horizon: 5
+
+features:
+  lookback_days: 60
+  indicators:
+    returns: [1, 5, 20]
+    sma: [20, 50]
+    ema: [20]
+    rsi: 14
+    roc: 10
+    macd: [12, 26, 9]
+    volatility: [21, 63]
+    atr: 14
+  groups:
+    - price
+    - technical
+    - volatility
+    - market
+    - relative
+    - sector
+
+models:
+  xgboost:
+    n_estimators: 100
+    max_depth: 4
+    learning_rate: 0.05
+    reg_lambda: 1.0
+    random_seed: 42
+  lstm:
+    sequence_length: 20
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.2
+    learning_rate: 0.001
+    epochs: 25
+    batch_size: 32
+    early_stopping_patience: 5
+    random_seed: 42
+  ensemble:
+    weighting_method: "inverse_validation_rmse"  # pre-registered rule
+    regime_aware: false
+
+portfolio:
+  risk_free_rate: 0.065   # 6.5% Indian 10-year G-Sec
+  max_stock_weight: 0.40  # 40% maximum per stock
+  max_sector_weight: 0.35 # 35% maximum per sector
+  min_holdings: 4
+  rebalance_frequency_days: 21
+  cost_penalty_gamma: 0.5 # penalty on turnover in objective
+
+adaptation:
+  retrain_interval_days: 21
+  min_feedback_observations: 20
+  bootstrap_iterations: 1000
+  bootstrap_alpha: 0.05
+  promotion_gate:
+    require_positive_ci_lower_bound: true
+    max_acceptable_drawdown_increase: 0.05
+    max_acceptable_turnover_increase: 0.30

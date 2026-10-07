@@ -7,7 +7,6 @@ import pandas as pd
 from ml.models.baseline import HistoricalMeanBaseline
 from ml.models.xgboost_model import SmartFolioXGBoost
 from ml.models.lstm_model import SmartFolioLSTM
-from ml.models.ensemble import SmartFolioEnsemble
 from ml.evaluation.evaluate import compute_prediction_metrics
 from config.settings import FEATURE_COLUMNS
 
@@ -43,11 +42,3 @@ def test_lstm_model(sample_dataset):
     preds = model.predict(X[80:])
     assert len(preds) == len(X) - 80
     assert not np.isnan(preds).any()
-
-def test_ensemble_model(sample_dataset):
-    X, y = sample_dataset
-    ensemble = SmartFolioEnsemble().fit(X[:60], y[:60], X[60:80], y[60:80])
-    preds = ensemble.predict(X[80:])
-    assert len(preds) == len(X) - 80
-    assert ensemble.weight_xgb > 0 and ensemble.weight_lstm > 0
-    assert np.isclose(ensemble.weight_xgb + ensemble.weight_lstm, 1.0)

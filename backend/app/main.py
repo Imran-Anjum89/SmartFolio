@@ -7,14 +7,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from backend.app.database.connection import init_db
-from backend.app.api import stocks, predictions, portfolios, feedback, backtesting
+from backend.app.api import stocks, predictions, portfolios
 
 # Initialize Database tables
 init_db()
 
 app = FastAPI(
     title="SmartFolio API",
-    description="Intelligent Investment Decision-Support System with ML Forecasting & Ledoit-Wolf Markowitz Optimization",
+    description="Intelligent Investment Decision-Support System with ML Forecasting & Ledoit-Wolf Markowitz Optimization (Weeks 1-6)",
     version="1.0"
 )
 
@@ -27,12 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register API Routers
+# Register API Routers (Weeks 1 to 6)
 app.include_router(stocks.router, prefix="/api")
 app.include_router(predictions.router, prefix="/api")
 app.include_router(portfolios.router, prefix="/api")
-app.include_router(feedback.router, prefix="/api")
-app.include_router(backtesting.router, prefix="/api")
 
 @app.get("/api/health")
 def health_check():

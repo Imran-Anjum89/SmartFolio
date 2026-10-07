@@ -1,0 +1,15 @@
+# Indian Equity Market Transaction Costs & Statutory Friction Specification
+# Based on current NSE, SEBI & statutory rates for delivery transactions
+
+rates:
+  stt_delivery_sale: 0.0010        # 0.10% Securities Transaction Tax on sale
+  brokerage_delivery: 0.0003       # ~0.03% average discount brokerage
+  exchange_turnover_fee: 0.0000325 # ~0.00325% NSE exchange fee
+  sebi_turnover_charge: 0.000001   # ₹10 per crore (0.0001%)
+  gst_on_brokerage_exchange: 0.00006 # 18% GST on brokerage + exchange
+  stamp_duty_buy: 0.00015          # 0.015% stamp duty on buy
+  slippage_estimate: 0.00025       # 2.5 bps execution slippage for large caps
+
+summary:
+  total_roundtrip_bps: 15.0        # Baseline assumption: 15 bps (0.15% per traded volume)
+  fee_rate: 0.0015

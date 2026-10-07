@@ -48,30 +48,3 @@ class StockPredictionRecord(Base):
     absolute_error = Column(Float, nullable=True)
     squared_error = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-
-class ModelFeedbackRecord(Base):
-    __tablename__ = "model_feedback"
-
-    id = Column(String(64), primary_key=True, index=True)
-    prediction_id = Column(String(64), nullable=True)
-    symbol = Column(String(32), nullable=False)
-    predicted_return = Column(Float, nullable=False)
-    actual_return = Column(Float, nullable=False)
-    prediction_error = Column(Float, nullable=False)
-    model_version = Column(String(32), nullable=False)
-    used_for_retraining = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class ModelPromotionRecord(Base):
-    __tablename__ = "model_promotions"
-
-    id = Column(String(64), primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-    champion_version = Column(String(32), nullable=False)
-    challenger_version = Column(String(32), nullable=False)
-    decision = Column(String(64), nullable=False)
-    promoted = Column(Boolean, nullable=False)
-    champion_sharpe = Column(Float)
-    challenger_sharpe = Column(Float)
-    sharpe_diff = Column(Float)
-    reason = Column(Text)

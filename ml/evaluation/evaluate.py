@@ -88,14 +88,21 @@ def compute_portfolio_metrics(
     # Calmar Ratio
     calmar = float(ann_return / (abs(max_dd) + 1e-8)) if max_dd < 0 else 0.0
     
+    # CVaR (Expected Shortfall at 95% confidence) (Section 24.2)
+    var_95 = np.percentile(returns, 5)
+    tail_losses = returns[returns <= var_95]
+    cvar_95 = float(np.mean(tail_losses)) if len(tail_losses) > 0 else float(var_95)
+
     return {
         "cumulative_return": round(cum_return, 4),
         "annualized_return": round(ann_return, 4),
         "annualized_volatility": round(ann_vol, 4),
+        "volatility": round(ann_vol, 4),
         "sharpe_ratio": round(sharpe, 4),
         "sortino_ratio": round(sortino, 4),
         "max_drawdown": round(max_dd, 4),
-        "calmar_ratio": round(calmar, 4)
+        "calmar_ratio": round(calmar, 4),
+        "cvar_95": round(cvar_95, 4)
     }
 
 def bootstrap_sharpe_difference(

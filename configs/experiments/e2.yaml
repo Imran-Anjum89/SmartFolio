@@ -1,0 +1,8 @@
+id: "E2"
+name: "Markowitz + Ledoit-Wolf"
+description: "Classical Mean Return with Ledoit-Wolf Covariance Shrinkage"
+model: "historical_mean"
+covariance: "ledoit_wolf"
+cost_aware_optimization: false
+feedback_adaptation: false
+objective: "max_sharpe"

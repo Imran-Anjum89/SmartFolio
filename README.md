@@ -1,153 +1,195 @@
-# SmartFolio: An Adaptive Feedback-Driven Machine Learning Framework for Portfolio Optimization and Investment Decision Making
+# SmartFolio: Weeks 1–6 Quantitative ML Portfolio Decision System
 
-SmartFolio is an intelligent decision-support system integrating **XGBoost & PyTorch LSTM Return Forecasting**, **Ledoit-Wolf Covariance Shrinkage**, **Markowitz Portfolio Optimization**, **Leakage-Free Walk-Forward Backtesting (E0–E6)**, **Dual Feedback Tracking**, and a **Portfolio-Sharpe Champion–Challenger Adaptive Retraining Mechanism**.
+**SmartFolio: Point-in-Time Indian Equity Analytics, ML Forecasting, and Risk-Aware Markowitz Portfolio Optimization**
 
-Evaluated on the Indian equity market using the liquid **NIFTY 50 universe**, with explicit consideration of survivorship bias, Indian market transaction fees (15 bps), and realistic allocation constraints ($0 \le w_i \le 0.40$, $\sum w_i = 100\%$).
-
----
-
-## 📌 Key Architectural Innovations
-
-1. **Prediction Accuracy vs Portfolio Decision Quality (Gap 1)**:
-   - Evaluates models on two distinct tracks: statistical forecasting metrics ($\text{MAE}, \text{RMSE}, R^2, \text{Directional Accuracy}$) and portfolio decision metrics ($\text{Sharpe Ratio}, \text{Sortino Ratio}, \text{Calmar Ratio}, \text{Max Drawdown}, \text{Turnover}$).
-
-2. **Portfolio-Sharpe Champion–Challenger Retraining Gate (Gap 4)**:
-   - Avoids blind daily retraining.
-   - Retrains a Challenger candidate on accumulated historical + feedback observations.
-   - Evaluates Champion vs Challenger on unseen out-of-sample data.
-   - Promotes Challenger to New Champion **only if** $\text{Sharpe}_{\text{Challenger}} > \text{Sharpe}_{\text{Champion}}$ on out-of-sample portfolios, protecting the system against negative adaptation.
-
-3. **Ledoit-Wolf Shrinkage Covariance (Gap 5)**:
-   - Shrinks sample covariance toward constant correlation target, eliminating noise and singularity in financial covariance matrices.
-
-4. **Leakage-Free Walk-Forward Evaluation with Indian Fees (Gap 3 & 6)**:
-   - Tests experiments E0 through E6 strictly moving forward in time without future data leakage.
-   - Incorporates realistic Indian transaction costs (STT + SEBI + Brokerage = 15 bps per trade).
-
-5. **Allocation-Level Rule-Based Explainability (Gap 7)**:
-   - Generates transparent, rule-based rationale for every asset weight recommendation (expected return driver, volatility factor, constraint ceiling).
+> **Academic Milestone:** Phase 1 Deliverables (Weeks 1 to 6)  
+> **Market:** Indian Equities, National Stock Exchange (NSE) NIFTY 50  
+> **Research Foundations:** Point-in-time data architecture, leakage-free feature engineering, Ledoit-Wolf covariance shrinkage, and ML return forecasting (XGBoost & PyTorch LSTM)  
+> **Core Principle:** Portfolio quality and statistical robustness matter more than raw prediction accuracy.
 
 ---
 
-## 🔬 Experimental Framework (E0 to E6)
+## 1. System Architecture (Weeks 1–6)
 
-| ID | Experiment Name | Model Pipeline | Covariance | Strategy / Features |
+```text
+Point-in-time market data (NIFTY 50 universe, historical OHLCV)
+        ↓
+Leakage & survivorship safeguards (Universe(t) point-in-time eligibility)
+        ↓
+Feature engineering (Price, Technical indicators, Volatility, Sector relative)
+        ↓
+Strict temporal train/val split (Zero look-ahead bias validation)
+        ↓
+ML Return Forecasting:
+  ├── Historical Mean Baseline (Week 4 benchmark)
+  ├── XGBoost Regressor (Week 5 tabular gradient boosting)
+  └── PyTorch LSTM Regressor (Week 6 sequential recurrent neural network)
+        ↓
+Expected-return forecasts (μ̂)  +  Ledoit–Wolf covariance shrinkage (Σ̂_LW)
+        ↓
+Constrained Markowitz Portfolio Optimizer:
+  [max μ̂ᵀw - (λ/2)wᵀΣ̂w  s.t.  ∑w_i = 1,  0 ≤ w_i ≤ 0.40]
+        ↓
+Allocation Decision Rationale & SHAP-based Explainability
+        ↓
+Glassmorphic Web Dashboard & FastAPI REST Service
+```
+
+---
+
+## 2. Research Questions & Hypotheses (Weeks 1–6)
+
+- **H1:** Machine learning-based return forecasts (XGBoost, LSTM) provide superior directional and risk-adjusted inputs for portfolio construction relative to simple historical mean extrapolation.
+- **H2:** Ledoit–Wolf covariance shrinkage ($\Sigma_{\text{LW}}$) produces significantly better conditioned covariance matrices than empirical sample covariance, preventing extreme or unstable portfolio weights.
+- **H3:** Sequential deep learning (PyTorch LSTM) captures temporal autocorrelations in market returns that complement tree-based gradient boosted models (XGBoost).
+
+---
+
+## 3. Experimental Ladder (E0 to E4)
+
+| Experiment | Strategy Name | Return Forecast ($\hat{\mu}$) | Covariance Matrix ($\hat{\Sigma}$) | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| **E0** | Equal Weight | None ($w_i = 1/N$) | N/A | Fixed 1/N Benchmark |
-| **E1** | Traditional Markowitz | Historical Mean Return | Sample Covariance | Standard Markowitz MPT |
-| **E2** | Markowitz + Ledoit-Wolf | Historical Mean Return | Ledoit-Wolf Shrinkage | Covariance Noise Reduction |
-| **E3** | XGBoost + Markowitz | XGBoost Regressor | Ledoit-Wolf Shrinkage | Tabular Gradient Boosting |
-| **E4** | LSTM + Markowitz | PyTorch LSTM Regressor | Ledoit-Wolf Shrinkage | Sequential Deep Learning |
-| **E5** | XGB-LSTM Ensemble | XGBoost + PyTorch LSTM | Ledoit-Wolf Shrinkage | Validation-Weighted Ensemble |
-| **E6** | **SmartFolio Adaptive** | Champion ML Model | Ledoit-Wolf Shrinkage | **Full Feedback + Adaptive Retraining + Portfolio Sharpe Gate + Indian Fees** |
+| **E0** | Equal Weight | None ($w_i = 1/N$) | N/A | Naive $1/N$ Benchmark |
+| **E1** | Classical Markowitz | Historical Mean Return | Sample Covariance | Classical 1952 Modern Portfolio Theory |
+| **E2** | Markowitz + Ledoit-Wolf | Historical Mean Return | Ledoit-Wolf Shrinkage | Covariance Noise Reduction via Shrinkage |
+| **E3** | XGBoost + Markowitz | XGBoost Regressor | Ledoit-Wolf Shrinkage | Tabular Non-linear Gradient Boosting |
+| **E4** | PyTorch LSTM + Markowitz | PyTorch LSTM Regressor | Ledoit-Wolf Shrinkage | Sequential Deep Recurrent Network |
 
 ---
 
-## 🚀 Quickstart Guide
+## 4. Weekly Milestone Breakdown
 
-### 1. Installation
-
-Ensure Python 3.10+ is installed.
-
-```bash
-git clone https://github.com/YourRepo/SmartFolio.git
-cd SmartFolio
-pip install -r requirements.txt
-```
-
-### 2. Running Automated Tests
-
-Run the complete test suite covering indicators, leakage checks, ML models, optimizer constraints, feedback gates, explainability, and walk-forward backtesting:
-
-```bash
-pytest -v
-```
-
-### 3. Launching the Web Application
-
-Start the FastAPI backend with embedded glassmorphic frontend:
-
-```bash
-uvicorn backend.app.main:app --reload --port 8000
-```
-
-Open your browser and navigate to:
-```
-http://localhost:8000
-```
+- **Week 1: Problem Definition & Research Foundations**  
+  Formulated formal mathematical problem statement, research hypotheses $H_1–H_3$, and experimental ladder configurations (`configs/base.yaml`, `configs/experiments/e0.yaml` to `e4.yaml`).
+- **Week 2: Point-in-Time Data Architecture & Ingestion**  
+  Engineered point-in-time universe loader (`config/universe.json`), robust multi-symbol ingestion engine with real-world synthetic fallback (`backend/app/services/data_service.py`), and data validation suite.
+- **Week 3: Feature Engineering & Leakage Protection**  
+  Created 18+ technical and statistical indicators (SMA, EMA, RSI, MACD, Bollinger Bands, ATR, Rolling Volatility, Momentum) in `ml/features/indicators.py`, with strict temporal leakage assertions in `ml/features/leakage_checks.py`.
+- **Week 4: Financial Baselines & Ledoit-Wolf Covariance**  
+  Implemented Historical Mean Return baseline (`ml/models/baseline.py`), Ledoit-Wolf covariance shrinkage estimator (`backend/app/services/risk_service.py`), and constrained Markowitz Mean-Variance optimizer (`backend/app/services/optimizer_service.py`).
+- **Week 5: ML Model A — XGBoost Regressor & Explainability**  
+  Built gradient boosted decision tree forecaster (`ml/models/xgboost_model.py`) and SHAP-based feature attribution engine (`ml/explainability/xgb_shap.py`) with allocation decision rationales.
+- **Week 6: ML Model B — PyTorch Sequential LSTM Network**  
+  Developed sequential sliding-window PyTorch LSTM network (`ml/models/lstm_model.py`) for multi-step temporal pattern extraction and comparative model benchmarking.
 
 ---
 
-## 📂 Project Structure
+## 5. Repository Structure
 
-```
+```text
 SmartFolio/
 │
-├── config/
-│   ├── settings.py                     # Environment variables, RANDOM_SEED=42, RETRAIN_INTERVAL_DAYS=21
-│   └── universe.json                   # Versioned Indian NIFTY 50 stock universe definition
+├── configs/                            # Configuration files
+│   ├── base.yaml                       # Base configuration (Seed 42, lookbacks)
+│   ├── costs.yaml                      # Indian market statutory levies & fees (15 bps)
+│   └── experiments/                    # Experiment definitions (E0 to E4)
+│       ├── e0.yaml
+│       ├── e1.yaml
+│       ├── e2.yaml
+│       ├── e3.yaml
+│       └── e4.yaml
 │
-├── backend/
-│   └── app/
-│       ├── main.py                     # FastAPI Application entrypoint
-│       │
-│       ├── api/                        # REST API Endpoints
-│       │   ├── stocks.py               # Stock universe & indicator endpoints
-│       │   ├── predictions.py          # Forecasts & model comparison
-│       │   ├── portfolios.py           # Portfolio optimization & decision engine endpoints
-│       │   ├── feedback.py             # Dual feedback & adaptive retraining endpoints
-│       │   └── backtesting.py          # Walk-forward backtest (E0-E6) endpoints
-│       │
-│       ├── services/                   # Business Logic & Core Engines
-│       │   ├── data_service.py         # yfinance ingestion + synthetic fallback + data_source tagging
-│       │   ├── feature_service.py      # RSI, MACD, SMA, EMA, Volatility, ROC calculation
-│       │   ├── ml_service.py           # XGBoost, PyTorch LSTM, Ensemble & Champion-Challenger Selector
-│       │   ├── feedback_service.py     # Dual prediction & portfolio feedback tracking
-│       │   ├── risk_service.py         # Ledoit-Wolf Covariance & Risk metrics
-│       │   ├── optimizer_service.py    # Markowitz Engine (Max Sharpe, Min Vol, Risk-Aware)
-│       │   ├── explainer_service.py    # Allocation-level rule-based explainability
-│       │   └── backtest_service.py     # Walk-forward Backtester with Indian fees & Bootstrap CIs
-│       │
-│       ├── models/                     # SQLAlchemy DB Models
-│       │   └── db_models.py
-│       ├── schemas/                    # Pydantic Schemas
-│       │   └── schemas.py
-│       └── database/                   # Database setup (SQLite default + PostgreSQL schema.sql)
-│           ├── connection.py
-│           └── schema.sql
+├── data/                               # Data architecture
+│   ├── raw/                            # Ingested OHLCV datasets
+│   ├── processed/                      # Feature matrices & adjusted prices
+│   ├── research/                       # Predictions & portfolio records
+│   ├── metadata/                       # Point-in-time universe records
+│   └── cache/                          # Cache directory
 │
-├── ml/
-│   ├── features/                       # Technical Feature Pipeline
-│   │   ├── indicators.py
-│   │   └── leakage_checks.py          # Automated temporal leakage verification
-│   ├── models/                         # ML Models
-│   │   ├── baseline.py                 # Historical Mean Baseline
+├── ml/                                 # Machine Learning & Quantitative Finance Core
+│   ├── features/
+│   │   ├── indicators.py               # Technical features without look-ahead bias
+│   │   └── leakage_checks.py           # Mathematical temporal leakage assertions
+│   ├── models/
+│   │   ├── baseline.py                 # Historical mean benchmark
 │   │   ├── xgboost_model.py            # XGBoost Regressor
-│   │   ├── lstm_model.py               # PyTorch LSTM Regressor
-│   │   └── ensemble.py                 # Champion-Challenger & Weighted Ensemble
-│   ├── feedback/                       # Feedback Loop Manager
-│   │   └── feedback_loop.py
-│   └── evaluation/                     # Metrics (MAE, RMSE, R², Sharpe, Sortino, Calmar, Bootstrap)
-│       └── evaluate.py
+│   │   └── lstm_model.py               # PyTorch LSTM Regressor
+│   ├── explainability/
+│   │   └── xgb_shap.py                 # Feature attribution & decision rationale
+│   └── evaluation/
+│       └── evaluate.py                 # Sharpe, Sortino, Calmar, CVaR 95%
 │
-├── frontend/                           # Glassmorphic Single-Page Web Dashboard
-│   ├── index.html                      # Single-page app layout with tabbed UI
-│   ├── css/
-│   │   └── styles.css                  # Dark-theme layout & typography
+├── backend/                            # FastAPI REST API Backend
+│   └── app/
+│       ├── main.py                     # Entrypoint & static UI mount
+│       ├── api/                        # REST routes (stocks, predictions, portfolios)
+│       ├── services/                   # Engines (Data, Risk, Optimizer, Explainer, ML)
+│       ├── models/db_models.py         # SQLAlchemy ORM models
+│       ├── schemas/schemas.py          # Pydantic schemas
+│       └── database/schema.sql         # SQL DDL (PostgreSQL & SQLite)
+│
+├── frontend/                           # Glassmorphic Interactive Web Dashboard
+│   ├── index.html                      # Single-page interface
+│   ├── css/styles.css                  # Modern dark glassmorphic design system
 │   └── js/
-│       ├── app.js                      # UI routing & controller
-│       ├── optimizer.js                # Portfolio setup, allocation & rule-based explanation UI
-│       ├── ml_dashboard.js             # Model comparison (XGBoost vs LSTM vs Ensemble) UI
-│       ├── feedback.js                 # Dual Feedback log & Champion-Challenger Retraining UI
-│       ├── backtest.js                 # Walk-Forward Benchmark (E0-E6) charts & metrics
-│       └── stock_explorer.js          # Interactive technical indicator viewer
+│       ├── app.js                      # Router & controller
+│       ├── optimizer.js                # Portfolio setup & explainability modal
+│       ├── ml_dashboard.js             # Model comparison & feature attribution
+│       ├── stock_explorer.js           # Technical indicator candlestick explorer
+│       └── compliance.js               # Accessibility & consent manager
 │
-└── tests/                              # Pytest Suite
-    ├── test_data.py                    # Market data cleaning & data_source tagging tests
-    ├── test_features.py                # Technical feature tests & leakage checks
-    ├── test_ml.py                      # XGBoost, PyTorch LSTM, Ensemble tests
-    ├── test_feedback.py                # Dual feedback & Portfolio-Sharpe promotion/rejection tests
-    ├── test_optimizer.py               # Ledoit-Wolf & Markowitz constraint tests
-    ├── test_explainer.py               # Rule-based explainability tests
-    └── test_backtester.py              # Walk-forward strategy evaluation (E0-E6) tests
+├── tests/                              # Automated Pytest Suite (12 / 12 passing)
+│   ├── test_data.py
+│   ├── test_features.py
+│   ├── test_ml.py
+│   ├── test_optimizer.py
+│   └── test_explainer.py
+│
+├── run_experiment.py                   # CLI: Run individual experiments (E0 to E4)
+├── requirements.txt                    # Python dependencies
+└── README.md                           # Documentation
+```
+
+---
+
+## 6. Verification & Automated Test Suite (12 / 12 Passed)
+
+Run the automated test suite verifying all Weeks 1 to 6 components:
+
+```powershell
+python -m pytest -v
+```
+
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.12.2, pytest-9.1.1
+rootdir: C:\Users\mdimr\OneDrive\Desktop\SmartFolio
+collected 12 items
+
+tests/test_data.py::test_universe_loading PASSED                         [  8%]
+tests/test_data.py::test_fetch_stock_data_source_tagging PASSED          [ 16%]
+tests/test_explainer.py::test_allocation_explainability PASSED           [ 25%]
+tests/test_features.py::test_compute_technical_indicators PASSED         [ 33%]
+tests/test_features.py::test_generate_target PASSED                      [ 41%]
+tests/test_features.py::test_leakage_checks PASSED                       [ 50%]
+tests/test_ml.py::test_historical_mean_baseline PASSED                   [ 58%]
+tests/test_ml.py::test_xgboost_model PASSED                              [ 66%]
+tests/test_ml.py::test_lstm_model PASSED                                 [ 75%]
+tests/test_optimizer.py::test_ledoit_wolf_covariance PASSED              [ 83%]
+tests/test_optimizer.py::test_markowitz_constraints PASSED               [ 91%]
+tests/test_optimizer.py::test_risk_profiles_behavior PASSED              [100%]
+
+============================= 12 passed in 11.23s =============================
+```
+
+---
+
+## 7. How to Run
+
+### 7.1 Web Dashboard & API Server (Unified on Port 8000)
+```powershell
+python -m uvicorn backend.app.main:app --port 8000 --reload
+```
+- **Web Dashboard:** [http://localhost:8000/](http://localhost:8000/)
+- **REST API Docs (Swagger):** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Health Check:** [http://localhost:8000/api/health](http://localhost:8000/api/health)
+
+### 7.2 CLI Experiment Runner
+```powershell
+# Run individual experiments from E0 to E4
+python run_experiment.py --experiment E0
+python run_experiment.py --experiment E1
+python run_experiment.py --experiment E2
+python run_experiment.py --experiment E3
+python run_experiment.py --experiment E4
 ```

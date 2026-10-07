@@ -28,11 +28,17 @@ class PortfolioOptimizerService:
         cov_matrix: np.ndarray,
         strategy: str = "max_sharpe",
         risk_profile: str = "moderate",
-        total_capital: float = 100000.0
+        total_capital: float = 100000.0,
+        prev_weights: Optional[np.ndarray] = None,
+        cost_penalty_gamma: float = 0.0,
+        fee_rate: float = 0.0015,
+        sector_map: Optional[Dict[str, str]] = None,
+        max_sector_weight: float = 0.35
     ) -> Dict[str, Any]:
         """
         Optimize asset allocation weights based on expected returns and covariance.
         Strategies: 'max_sharpe', 'min_volatility', 'risk_aware'.
+        Includes Cost-Aware optimization with turnover penalty (Section 17).
         """
         symbols = list(expected_returns.keys())
         n = len(symbols)
@@ -41,30 +47,46 @@ class PortfolioOptimizerService:
 
         mu = np.array([expected_returns[s] for s in symbols], dtype=float)
         
-        # Initial guess: equal weights
-        init_w = np.full(n, 1.0 / n)
+        # Initial guess: equal weights or previous weights
+        init_w = prev_weights if (prev_weights is not None and len(prev_weights) == n) else np.full(n, 1.0 / n)
         bounds = tuple((self.w_min, self.w_max) for _ in range(n))
         constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1.0}]
+
+        # Optional Sector Constraints (Section 18)
+        if sector_map is not None:
+            unique_sectors = set(sector_map.get(s, "Other") for s in symbols)
+            for sec in unique_sectors:
+                sec_indices = [i for i, s in enumerate(symbols) if sector_map.get(s, "Other") == sec]
+                if len(sec_indices) > 0 and len(sec_indices) < n:
+                    constraints.append({
+                        "type": "ineq",
+                        "fun": lambda w, idxs=sec_indices: max_sector_weight - np.sum(w[idxs])
+                    })
 
         # Risk Aversion parameter from profile
         profile_cfg = RISK_PROFILES.get(risk_profile.lower(), RISK_PROFILES["moderate"])
         risk_aversion = profile_cfg["risk_aversion"]
 
+        w_old = prev_weights if (prev_weights is not None and len(prev_weights) == n) else np.zeros(n)
+
         if strategy == "min_volatility":
             def objective(w):
-                return float(w.T @ cov_matrix @ w)
+                cost_term = (cost_penalty_gamma * fee_rate * np.sum(np.abs(w - w_old))) if cost_penalty_gamma > 0 else 0.0
+                return float(w.T @ cov_matrix @ w + cost_term)
         elif strategy == "risk_aware":
             def objective(w):
                 port_ret = float(w.T @ mu)
                 port_var = float(w.T @ cov_matrix @ w)
-                # Maximize w^T mu - (lambda / 2) w^T Sigma w -> Minimize negative utility
-                return -(port_ret - (risk_aversion / 2.0) * port_var)
+                cost_term = (cost_penalty_gamma * fee_rate * np.sum(np.abs(w - w_old))) if cost_penalty_gamma > 0 else 0.0
+                # Maximize w^T mu - (lambda / 2) w^T Sigma w - gamma * Cost -> Minimize negative
+                return -(port_ret - (risk_aversion / 2.0) * port_var - cost_term)
         else:  # default 'max_sharpe'
             def objective(w):
                 port_ret = float(w.T @ mu)
                 port_vol = float(np.sqrt(max(w.T @ cov_matrix @ w, 1e-8)))
-                # Maximize Sharpe Ratio -> Minimize negative Sharpe
-                return -(port_ret - self.rf) / port_vol
+                cost_term = (cost_penalty_gamma * fee_rate * np.sum(np.abs(w - w_old))) if cost_penalty_gamma > 0 else 0.0
+                # Maximize Sharpe Ratio minus turnover friction
+                return -((port_ret - self.rf - cost_term) / port_vol)
 
         # Solve optimization
         opt_res = sco.minimize(
@@ -107,6 +129,9 @@ class PortfolioOptimizerService:
         # Sort asset breakdown by weight descending
         asset_allocations.sort(key=lambda x: x["weight"], reverse=True)
 
+        turnover_val = float(np.sum(np.abs(weights - w_old))) if prev_weights is not None else 0.0
+        est_cost = float(turnover_val * fee_rate * total_capital)
+
         return {
             "strategy": strategy,
             "risk_profile": risk_profile,
@@ -115,6 +140,9 @@ class PortfolioOptimizerService:
             "expected_portfolio_return": round(port_ret, 4),
             "portfolio_volatility": round(port_vol, 4),
             "sharpe_ratio": round(port_sharpe, 4),
+            "turnover": round(turnover_val, 4),
+            "estimated_cost_inr": round(est_cost, 2),
+            "cost_aware": bool(cost_penalty_gamma > 0),
             "constraints": {
                 "sum_weights": round(float(np.sum(weights)), 4),
                 "max_weight_constraint": self.w_max,

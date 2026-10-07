@@ -32,19 +32,13 @@
             </div>
         </div>
 
-        <!-- Integrated Center Navigation -->
+        <!-- Integrated Center Navigation (Weeks 1 to 6) -->
         <nav class="nav-bar" role="navigation" aria-label="Main Application Modules">
             <button class="nav-tab active" data-tab="tab-optimizer" id="btn-tab-optimizer" role="tab" aria-selected="true" aria-controls="tab-optimizer">
                 <span class="tab-icon" aria-hidden="true">💼</span> Optimizer
             </button>
             <button class="nav-tab" data-tab="tab-ml" id="btn-tab-ml" role="tab" aria-selected="false" aria-controls="tab-ml">
                 <span class="tab-icon" aria-hidden="true">🧠</span> Intelligence
-            </button>
-            <button class="nav-tab" data-tab="tab-feedback" id="btn-tab-feedback" role="tab" aria-selected="false" aria-controls="tab-feedback">
-                <span class="tab-icon" aria-hidden="true">🔄</span> Feedback
-            </button>
-            <button class="nav-tab" data-tab="tab-backtest" id="btn-tab-backtest" role="tab" aria-selected="false" aria-controls="tab-backtest">
-                <span class="tab-icon" aria-hidden="true">📈</span> Backtest
             </button>
             <button class="nav-tab" data-tab="tab-explorer" id="btn-tab-explorer" role="tab" aria-selected="false" aria-controls="tab-explorer">
                 <span class="tab-icon" aria-hidden="true">📊</span> Market Explorer
@@ -130,10 +124,9 @@
                         <div class="form-group">
                             <label for="select-ml-model">Return Forecaster (μ̂)</label>
                             <select id="select-ml-model" class="custom-select" aria-label="Machine Learning Forecasting Model">
-                                <option value="ensemble" selected>XGBoost + LSTM Ensemble</option>
-                                <option value="xgboost">XGBoost Regressor</option>
-                                <option value="lstm">PyTorch LSTM</option>
-                                <option value="baseline">Historical Mean (Baseline)</option>
+                                <option value="xgboost" selected>XGBoost Regressor (Week 5)</option>
+                                <option value="lstm">PyTorch Sequential LSTM (Week 6)</option>
+                                <option value="baseline">Historical Mean Baseline (Week 4)</option>
                             </select>
                         </div>
                     </div>
@@ -293,140 +286,7 @@
             </div>
         </section>
 
-        <!-- TAB 3: FEEDBACK LOOP & RETRAINING -->
-        <section id="tab-feedback" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-feedback">
-            <div class="glass-card">
-                <div class="card-header-flex">
-                    <div>
-                        <h2 class="card-title">Dual Feedback Engine &amp; Champion–Challenger Lifecycle</h2>
-                        <p class="card-subtitle">Tracks prediction errors vs realized outcomes and enforces the Portfolio-Sharpe gate on candidate models.</p>
-                    </div>
-                    <button class="btn-primary-glow" id="btn-trigger-retrain" aria-label="Trigger Adaptive Model Retraining">
-                        <span>⚡ Trigger Adaptive Retraining</span>
-                    </button>
-                </div>
-
-                <!-- Feedback KPI Grid -->
-                <div class="metrics-row mt-4" role="region" aria-label="Model Feedback Metrics">
-                    <div class="metric-box">
-                        <span class="metric-label">Active Champion</span>
-                        <span class="metric-value text-purple" id="fb-champion-ver">v1.0</span>
-                        <span class="metric-sub">Production Model</span>
-                    </div>
-                    <div class="metric-box">
-                        <span class="metric-label">Feedback Records</span>
-                        <span class="metric-value" id="fb-total-count">0</span>
-                        <span class="metric-sub">Historical + Live</span>
-                    </div>
-                    <div class="metric-box">
-                        <span class="metric-label">Mean Abs. Error (MAE)</span>
-                        <span class="metric-value text-green" id="fb-mae">0.00%</span>
-                        <span class="metric-sub">Tracking Error</span>
-                    </div>
-                    <div class="metric-box">
-                        <span class="metric-label">Challenger Promotions</span>
-                        <span class="metric-value text-cyan" id="fb-promotions">0</span>
-                        <span class="metric-sub">Passed Sharpe Gate</span>
-                    </div>
-                </div>
-
-                <!-- Champion-Challenger Result Banner -->
-                <div class="challenger-card mt-4" id="challenger-status-box" style="display: none;" role="region" aria-label="Retraining Evaluation Results">
-                    <div class="challenger-header">
-                        <span class="badge-verdict" id="verdict-badge">PROMOTED</span>
-                        <span class="challenger-title" id="verdict-title">Champion vs Challenger Evaluation</span>
-                    </div>
-                    <p class="challenger-reason" id="verdict-reason">--</p>
-                </div>
-
-                <!-- Recent Prediction Feedback Logs -->
-                <h3 class="section-subtitle mt-4">Recent Prediction Error Logs</h3>
-                <div class="table-wrapper">
-                    <table class="data-table" id="table-feedback-logs" aria-label="Recent Prediction Error Log Table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Timestamp</th>
-                                <th scope="col">Symbol</th>
-                                <th scope="col">Model Version</th>
-                                <th scope="col">Predicted Return</th>
-                                <th scope="col">Actual Return</th>
-                                <th scope="col">Prediction Error</th>
-                                <th scope="col">Absolute Error</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td colspan="7" class="text-center text-muted">No feedback recorded yet. Trigger retraining or log predictions to populate.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 4: WALK-FORWARD BACKTEST (E0 - E6) -->
-        <section id="tab-backtest" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-backtest">
-            <div class="glass-card">
-                <div class="card-header-flex">
-                    <div>
-                        <h2 class="card-title">Walk-Forward Backtesting (Experiments E0 to E6)</h2>
-                        <p class="card-subtitle">Leakage-free rolling evaluation including turnover penalties and Indian equity transaction fees (15 bps).</p>
-                    </div>
-                    <button class="btn-primary" id="btn-run-backtest" aria-label="Run Walk-Forward Simulation across 7 strategies">
-                        <span>▶ Run Walk-Forward Simulation</span>
-                    </button>
-                </div>
-
-                <!-- Cumulative Wealth Chart -->
-                <div id="plot-backtest-wealth" class="chart-container-lg mt-4" role="img" aria-label="Cumulative Wealth Growth Curve from Experiments E0 to E6">
-                    <div class="loading-placeholder">Click "Run Walk-Forward Simulation" to evaluate all 7 strategies across historical timeline.</div>
-                </div>
-
-                <!-- Statistical Bootstrap Significance Banner -->
-                <div class="bootstrap-banner mt-4" id="bootstrap-box" style="display: none;" role="region" aria-label="Statistical Bootstrap Validation Results">
-                    <div class="bb-left">
-                        <span class="bb-badge">STATISTICAL VALIDATION (Gap 2)</span>
-                        <h4 id="bb-title">Δ Sharpe: E6 (SmartFolio Adaptive) vs E1 (Trad Markowitz)</h4>
-                    </div>
-                    <div class="bb-metrics">
-                        <div class="bb-metric">
-                            <span class="lbl">Point Estimate ΔSharpe</span>
-                            <span class="val text-green" id="bb-delta-val">+0.32</span>
-                        </div>
-                        <div class="bb-metric">
-                            <span class="lbl">95% Bootstrap CI</span>
-                            <span class="val" id="bb-ci-val">[+0.08, +0.55]</span>
-                        </div>
-                        <div class="bb-metric">
-                            <span class="lbl">Significance</span>
-                            <span class="val text-purple" id="bb-sig-val">Statistically Significant</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comparative Metrics Table -->
-                <h3 class="section-subtitle mt-4">Research Experiment Matrix Comparison</h3>
-                <div class="table-wrapper">
-                    <table class="data-table" id="table-backtest-summary" aria-label="Walk-Forward Backtest Strategy Comparison Table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Strategy / Experiment</th>
-                                <th scope="col">Cumulative Return</th>
-                                <th scope="col">Annualized Return</th>
-                                <th scope="col">Volatility</th>
-                                <th scope="col">Sharpe Ratio</th>
-                                <th scope="col">Sortino Ratio</th>
-                                <th scope="col">Max Drawdown</th>
-                                <th scope="col">Turnover</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td colspan="8" class="text-center text-muted">Run backtest to view comparative results across E0 to E6.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 5: MARKET EXPLORER -->
+        <!-- TAB 3: MARKET EXPLORER (Weeks 2-3) -->
         <section id="tab-explorer" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-explorer">
             <div class="glass-card">
                 <div class="card-header-flex">
@@ -1129,8 +989,6 @@
     <script src="js/app.js"></script>
     <script src="js/optimizer.js"></script>
     <script src="js/ml_dashboard.js"></script>
-    <script src="js/feedback.js"></script>
-    <script src="js/backtest.js"></script>
     <script src="js/stock_explorer.js"></script>
     <!-- Compliance, Legal, Accessibility & Consent Manager -->
     <script src="js/compliance.js"></script>

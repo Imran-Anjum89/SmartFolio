@@ -62,15 +62,44 @@ def compute_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df["volatility_21d"] = df["return_1d"].rolling(window=21).std() * np.sqrt(252)
     df["volatility_63d"] = df["return_1d"].rolling(window=63).std() * np.sqrt(252)
     
+    # Average True Range (ATR 14)
+    if "high" in df.columns and "low" in df.columns:
+        prev_close = close.shift(1)
+        tr1 = df["high"] - df["low"]
+        tr2 = (df["high"] - prev_close).abs()
+        tr3 = (df["low"] - prev_close).abs()
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        df["atr_14"] = (tr.rolling(window=14).mean()) / (close + 1e-8)
+    else:
+        df["atr_14"] = df["volatility_21d"] / np.sqrt(252)
+
     return df
+
+FEATURE_GROUPS = {
+    "price": ["return_1d", "return_5d", "return_21d"],
+    "technical": ["sma_20", "sma_50", "ema_20", "rsi_14", "roc_10", "macd", "macd_signal"],
+    "volatility": ["volatility_21d", "volatility_63d", "atr_14"],
+    "market": ["nifty_return_1d", "nifty_volatility_21d", "vix_level"],
+    "relative": ["rel_return_nifty_5d", "rel_volatility_nifty"],
+    "sector": ["sector_rel_return_5d"]
+}
 
 def generate_target(df: pd.DataFrame, horizon: int = 5) -> pd.DataFrame:
     """
     Generate future return target: FutureReturn_{h} = (Close_{t+h} / Close_t) - 1.
-    Strictly shifts forward so that target_5d represents returns over next h trading days.
+    Strictly shifts forward so that target_h represents returns over next h trading days.
     """
     df = df.copy()
     df[f"target_{horizon}d"] = df["close"].shift(-horizon) / df["close"] - 1.0
+    return df
+
+def generate_multi_horizon_targets(df: pd.DataFrame, horizons: List[int] = [1, 5, 20]) -> pd.DataFrame:
+    """
+    Generate multiple future return horizons (e.g. 1d, 5d, 20d) for multi-horizon research (Section 8).
+    """
+    df = df.copy()
+    for h in horizons:
+        df[f"target_{h}d"] = df["close"].shift(-h) / df["close"] - 1.0
     return df
 
 def prepare_feature_target_dataset(df: pd.DataFrame, feature_cols: List[str], horizon: int = 5) -> pd.DataFrame:

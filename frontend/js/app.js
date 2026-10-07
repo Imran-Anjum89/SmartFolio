@@ -35,7 +35,6 @@ function initTabs() {
 
                 // Auto-load tab data if first time
                 if (targetTab === "tab-ml") loadMLComparison();
-                if (targetTab === "tab-feedback") loadFeedbackSummary();
                 if (targetTab === "tab-explorer") loadExplorerData();
             }
         });

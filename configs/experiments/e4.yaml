@@ -1,0 +1,8 @@
+id: "E4"
+name: "LSTM + Markowitz"
+description: "PyTorch LSTM Recurrent Neural Network Expected Returns with Ledoit-Wolf Covariance"
+model: "lstm"
+covariance: "ledoit_wolf"
+cost_aware_optimization: false
+feedback_adaptation: false
+objective: "max_sharpe"
