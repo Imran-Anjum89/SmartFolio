@@ -13,11 +13,18 @@ const state = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
     initTabs();
     loadUniverse();
     initExplainerModal();
     initTickerRibbon();
 });
+
+function initTheme() {
+    if (typeof window.applySmartFolioTheme === "function" && typeof window.getSmartFolioTheme === "function") {
+        window.applySmartFolioTheme(window.getSmartFolioTheme());
+    }
+}
 
 function initTabs() {
     const tabs = document.querySelectorAll(".nav-tab");
